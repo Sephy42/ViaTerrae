@@ -1,4 +1,8 @@
 activeProfiles=
 eclipse.preferences.version=1
+<<<<<<< HEAD
 resolveWorkspaceProjects=true
+=======
+resolveWorkspaceProjects=false
+>>>>>>> 7d58dd1... new controller
 version=1
