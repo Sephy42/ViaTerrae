@@ -16,13 +16,11 @@ public abstract class AbstractService<T> implements IServiceActions<T> {
 	
 	@Override
 	public List<T> findAll() {
-		// TODO Auto-generated method stub
 		return getRepo().findAll();
 	}
 
 	@Override
 	public T findOne(Long id) {
-		// TODO Auto-generated method stub
 		Optional<T> opt = getRepo().findById(id);
 		if (opt.isPresent()) return opt.get();
 		throw new NotFoundException( id + " pas trouve");
@@ -30,31 +28,28 @@ public abstract class AbstractService<T> implements IServiceActions<T> {
 
 	@Override
 	public boolean deleteById(Long id) {
-		// TODO Auto-generated method stub
 		try {
 			getRepo().deleteById(id);
 			return true;
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			return false;
 		}
 	}
 
 	@Override
 	public boolean delete(T t) {
-		// TODO Auto-generated method stub
 		try {
 			getRepo().delete(t);
 			return true;
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+
 			return false;
 		}
 	}
 
 	@Override
 	public T save(T t) {
-		// TODO Auto-generated method stub
+
 		return getRepo().save(t);
 	}
 
