@@ -10,7 +10,10 @@ import com.formation.persistence.entities.Client;
 public interface IClientRepository extends JpaRepository<Client,Long> {
 	
 	@Query(nativeQuery = true,value = "SELECT * FROM clients WHERE name LIKE ?1")
-	public List<Client> findByName(String name);
+	List<Client> findByName(String name);
+
+	@Query(nativeQuery = true,value = "SELECT * FROM clients WHERE email = ?1")
+	Client findByMail(String username);
 	
 
 }

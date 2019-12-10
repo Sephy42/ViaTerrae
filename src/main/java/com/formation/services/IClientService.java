@@ -5,4 +5,6 @@ import com.formation.services.common.IServiceActions;
 
 public interface IClientService extends IServiceActions<Client> {
 
+	Client findByMail(String username);
+
 }

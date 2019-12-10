@@ -18,6 +18,9 @@ public class ClientService extends AbstractService<Client> implements IClientSer
 		return this.repo;
 	}
 	
-	
+	@Override
+	public Client findByMail(String username) {
+		return repo.findByMail(username);
+	}	
 
 }
