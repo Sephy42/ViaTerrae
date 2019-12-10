@@ -1,12 +1,12 @@
-package com.formation.services.common.implementation;
+package com.formation.services.implementation;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.formation.persistence.entities.Client;
 import com.formation.persistence.repository.IClientRepository;
+import com.formation.services.IClientService;
 import com.formation.services.common.AbstractService;
-import com.formation.services.common.IClientService;
 
 public class ClientService extends AbstractService<Client> implements IClientService {
 
