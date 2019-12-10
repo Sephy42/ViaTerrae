@@ -12,6 +12,7 @@ import javax.persistence.Table;
 // je fais un autre testeiiiih
 // Margot
 // Je rajoute un test
+// Je rajoute mon nom Baptiste
 @ Table (name = "clients") @Entity
 public class Client {
 	@Id
