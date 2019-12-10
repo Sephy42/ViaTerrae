@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.formation.persistence.entities.Client;
 import com.formation.persistence.repository.IClientRepository;
 import com.formation.services.IClientService;
-import com.formation.services.common.AbstractService;
+import com.formation.services.common.implementation.AbstractService;
 
 public class ClientService extends AbstractService<Client> implements IClientService {
 

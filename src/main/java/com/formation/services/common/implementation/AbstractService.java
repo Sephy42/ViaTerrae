@@ -1,4 +1,4 @@
-package com.formation.services.common;
+package com.formation.services.common.implementation;
 
 import java.util.List;
 import java.util.Optional;
@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.formation.exceptions.TrucNotFoundException;
+import com.formation.services.common.IServiceActions;
 
 @Transactional
 public abstract class AbstractService<T> implements IServiceActions<T> {
