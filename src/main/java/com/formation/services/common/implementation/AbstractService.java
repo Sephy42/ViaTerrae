@@ -1,4 +1,4 @@
-package com.formation.services.common;
+package com.formation.services.common.implementation;
 
 import java.util.List;
 import java.util.Optional;
@@ -6,7 +6,8 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.formation.exceptions.TrucNotFoundException;
+import com.formation.exceptions.NotFoundException;
+import com.formation.services.common.IServiceActions;
 
 @Transactional
 public abstract class AbstractService<T> implements IServiceActions<T> {
@@ -24,7 +25,7 @@ public abstract class AbstractService<T> implements IServiceActions<T> {
 		// TODO Auto-generated method stub
 		Optional<T> opt = getRepo().findById(id);
 		if (opt.isPresent()) return opt.get();
-		throw new TrucNotFoundException( id + " pas trouve");
+		throw new NotFoundException( id + " pas trouve");
 	}
 
 	@Override

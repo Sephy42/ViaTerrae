@@ -10,14 +10,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-
-// coucou c'est margot
-
-/**salut !!! */
-	
-	
-	
-	
 @ Table (name = "clients") @Entity
 public class Client {
 	@Id
