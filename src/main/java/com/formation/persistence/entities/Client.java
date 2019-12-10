@@ -10,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 // je fais un autre testeiiiih
+// Je rajoute un test
 @ Table (name = "clients") @Entity
 public class Client {
 	@Id
