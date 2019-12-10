@@ -9,7 +9,10 @@ import com.formation.persistence.repository.IClientRepository;
 import com.formation.services.IClientService;
 import com.formation.services.common.implementation.AbstractService;
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> branch 'devel' of https://github.com/Sephy42/ViaTerrae.git
 @Service
 public class ClientService extends AbstractService<Client> implements IClientService {
 
