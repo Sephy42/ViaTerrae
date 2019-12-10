@@ -9,10 +9,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
 // je fais un autre testeiiiih a
 // Margot a
-// Je rajoute un test a
-// Je rajoute mon nom Baptiste a
+// Je rajoute un test B
+// Je rajoute mon nom Baptiste B
 @ Table (name = "clients") @Entity
 public class Client {
 	@Id
