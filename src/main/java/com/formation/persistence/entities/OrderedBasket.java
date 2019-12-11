@@ -21,6 +21,13 @@ public class OrderedBasket {
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "basket_id",referencedColumnName = "id", nullable = false)
 	BasketType basket;
+	
+	public OrderedBasket() {
+		
+	}
+		public OrderedBasket(BasketType basket) {
+			setBasket(basket);
+		}
 
 	public Long getId() {
 		return id;

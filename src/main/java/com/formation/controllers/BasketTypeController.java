@@ -1,6 +1,5 @@
 package com.formation.controllers;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -17,8 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.formation.dto.basketType.BasketTypeFull;
 import com.formation.dto.basketType.BasketTypeLight;
+import com.formation.dto.basketType.toSave.BasketTypeToSave;
 import com.formation.dto.product.ProductFull;
+import com.formation.dto.product.UsedProduct;
 import com.formation.persistence.entities.BasketType;
+import com.formation.persistence.entities.BasketedProduct;
 import com.formation.services.IBasketTypeService;
 
 @RestController
@@ -45,15 +47,11 @@ public class BasketTypeController {
 		  BasketTypeFull FinalBasket= mapper.map(basket,BasketTypeFull.class);
 		  int n = basket.getListProduct().size();
 		  FinalBasket.setProductCount(n);
-		  Set<ProductFull> subListProduit= new HashSet<ProductFull>();
+		  Set<UsedProduct> subListProduit= getProductListByBasketType(id);
 		  if (n>2) {
-			  subListProduit= service.getProductsByBasketType(id).stream().limit(2).map(produit -> mapper.map(produit,ProductFull.class)).collect(Collectors.toSet());
-			  
-		  }	  else {
-			  subListProduit= service.getProductsByBasketType(id).stream().map(produit -> mapper.map(produit,ProductFull.class)).collect(Collectors.toSet());
-			  
-		  }		
-		  FinalBasket.setListProduct(subListProduit);
+			  subListProduit.stream().limit(2);			  
+		  }	  		
+		  FinalBasket.setListProduct( subListProduit);
 		  return FinalBasket;	    	     
 	}
 	
@@ -63,13 +61,23 @@ public class BasketTypeController {
 	}
 	
 	@PostMapping
-	public BasketTypeFull save(@RequestBody BasketTypeFull basket) {
+	public BasketTypeFull save(@RequestBody BasketTypeToSave basket) {
+		BasketType basketToSave = mapper.map(basket,BasketType.class);
+//		basket.getListProductToSave().stream().forEach(productToSave ->{
+//			basketToSave.getListProduct().add(new BasketedProduct(productToSave.getQuantity(), productToSave.getUnit(),serviceProduct.findById(productToSave.getProductId())));	
+//		});
+		service.save(basketToSave);
 		return mapper.map(service.save(mapper.map(basket, BasketType.class)),BasketTypeFull.class);
 	}
+
 	
 	@GetMapping(path="/{id}/products")
-	public List<ProductFull> getProductByBasketType(@PathVariable (value= "id") Long id) {
-		return service.getProductsByBasketType(id).stream().map(p -> mapper.map(p,ProductFull.class)).collect(Collectors.toList());
-	}	
+	public Set<UsedProduct> getProductListByBasketType(@PathVariable (value= "id") Long id) {
+		return service.getProductListByBasketType(id)
+				.stream()
+				.map(basketedProduct -> new UsedProduct(basketedProduct.getQuantity(),basketedProduct.getUnit(),mapper.map(basketedProduct.getProduct(),ProductFull.class)))
+				.collect(Collectors.toSet());
+
+	}
 }
 
