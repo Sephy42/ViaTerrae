@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,12 +16,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.formation.dto.clients.ClientFull;
 import com.formation.dto.clients.ClientLight;
+import com.formation.dto.clients.ClientToSave;
 import com.formation.exceptions.NotAuthorizedException;
 import com.formation.persistence.entities.Client;
 import com.formation.services.IAuthChecker;
 import com.formation.services.IClientService;
 
 
+/**
+ * @author Aelion
+ *
+ */
 @RestController
 @RequestMapping(path = "/api/private/client")
 public class ClientController {
@@ -34,6 +40,9 @@ public class ClientController {
 	
 	@Autowired
 	private IAuthChecker authChecker;
+	
+	@Autowired
+	private BCryptPasswordEncoder encoder;
 
 	
 	/**
@@ -81,9 +90,22 @@ public class ClientController {
 	}
 	
 	
-	@PostMapping() 
-	public ClientFull save(@RequestBody ClientFull cl) {
-		return mapper.map(service.save(mapper.map(cl, Client.class)), ClientFull.class);	
+	/**
+	 * @param cl
+	 * @return the client effectively saved
+	 * this action can only be done by the administrator
+	 */
+	@PostMapping
+	public ClientToSave save(@RequestBody ClientToSave cl) {
+		if (authChecker.getCurrentAdmin() != null ) {
+			cl.setPassword(encoder.encode(cl.getPassword()));
+			if (cl.getFirstName() == null) {
+				cl.setFirstName("Anonyme");
+			}
+			return mapper.map(service.save(mapper.map(cl, Client.class)), ClientToSave.class);	
+		}
+		throw new NotAuthorizedException();	
 	}
+
 	
 }

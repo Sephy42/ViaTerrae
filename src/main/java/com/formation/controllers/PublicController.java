@@ -1,5 +1,6 @@
 package com.formation.controllers;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -8,15 +9,19 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.formation.config.JwtTokenUtil;
+import com.formation.dto.clients.ClientToSave;
 import com.formation.dto.jwt.JwtRequest;
 import com.formation.dto.jwt.JwtResponse;
 import com.formation.exceptions.NotAuthorizedException;
+import com.formation.persistence.entities.Client;
+import com.formation.services.IClientService;
 
 
 
@@ -28,6 +33,14 @@ import com.formation.exceptions.NotAuthorizedException;
 @RequestMapping(path = "/api/public")
 public class PublicController {
 
+
+	@Autowired
+	private ModelMapper mapper;
+	
+	@Autowired
+	private IClientService clientService;
+	
+	
 	@Autowired
 	private AuthenticationManager authenticationManager;
 	
@@ -36,6 +49,10 @@ public class PublicController {
 	
 	@Autowired
 	private UserDetailsService userDetailsService;
+	
+	
+	@Autowired
+	private BCryptPasswordEncoder encoder;
 	
 	@PostMapping(value = "/authenticate")
 	public ResponseEntity<?> authenticate(@RequestBody JwtRequest authenticationRequest) throws Exception {
@@ -47,6 +64,22 @@ public class PublicController {
 		} catch (DisabledException | BadCredentialsException e) {
 			throw new NotAuthorizedException(e.getMessage());
 		}		
+	}
+	
+	
+	
+	/**
+	 * @param cl
+	 * @return the client effectively saved
+	 */
+	@PostMapping(value = "/client") 
+	public ClientToSave save(@RequestBody ClientToSave cl) {
+		
+		cl.setPassword(encoder.encode(cl.getPassword()));
+		if (cl.getFirstName() == null) {
+			cl.setFirstName("Anonyme");
+		}
+		return mapper.map(clientService.save(mapper.map(cl, Client.class)), ClientToSave.class);	
 	}
 	
 }
