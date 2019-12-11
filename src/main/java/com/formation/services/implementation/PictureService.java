@@ -10,15 +10,9 @@ import com.formation.persistence.repository.IPictureRepository;
 import com.formation.services.IPictureService;
 import com.formation.services.common.implementation.AbstractService;
 
-<<<<<<< HEAD
 
 @Service
 @Transactional
-=======
-@Service
-@Transactional
-
->>>>>>> branch 'devel' of https://github.com/Sephy42/ViaTerrae.git
 public class PictureService extends AbstractService<Picture> implements IPictureService  {
 	
 	@Autowired
