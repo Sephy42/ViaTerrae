@@ -13,6 +13,7 @@ import com.formation.persistence.repository.IBasketTypeRepository;
 import com.formation.services.IBasketTypeService;
 import com.formation.services.common.implementation.AbstractService;
 
+
 @Service
 @Transactional
 	public class  BasketTypeService extends AbstractService<BasketType>  implements IBasketTypeService{
@@ -26,7 +27,10 @@ import com.formation.services.common.implementation.AbstractService;
 			return repo;
 		}
 
-
+		/**
+		 * @author Aelion
+		 * Permet de retrouver la liste des produit utilisés dans un panier
+		 */
 
 		@Override
 		public Set<BasketedProduct> getProductListByBasketType(Long id) {

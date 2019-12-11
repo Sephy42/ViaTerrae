@@ -3,6 +3,7 @@ package com.formation.persistence.entities;
 import java.util.Date;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -30,11 +31,11 @@ public class BasketType {
 	@Column
 	String label;
 	
-	@OneToMany(orphanRemoval = true,fetch = FetchType.EAGER)
+	@OneToMany(orphanRemoval = true,fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name = "basket_id",referencedColumnName = "id", nullable = false)
 	private Set<BasketedProduct> listProduct;
 	
-	@OneToOne(orphanRemoval = true,fetch = FetchType.LAZY)
+	@OneToOne(orphanRemoval = true,fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "picture_id",referencedColumnName = "id")
 	private Picture picture;
 
