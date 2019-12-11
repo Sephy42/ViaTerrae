@@ -1,12 +1,5 @@
 package com.formation.dto.place;
 
-
-
-
-
-
-
-
 public class PlaceFull {
 	
 	Long id;

@@ -34,32 +34,43 @@ public class ClientController {
 	
 	@Autowired
 	private IAuthChecker authChecker;
+
 	
-	public ClientController() {
-		System.out.println("instanciation du controller de client");
-	}
-	
+	/**
+	 * @return the list of all ClientLight in the database
+	 * this action is only allowed to the administrator and throw an exception if launched by any other user
+	 */
 	@GetMapping
-	public List<ClientLight> findAll(){
-		
+	public List<ClientLight> findAll(){		
 		if (authChecker.getCurrentAdmin() != null ) {
 			return service.findAll()
 					.stream()
 					.map(c -> mapper.map(c, ClientLight.class))
 					.collect(Collectors.toList());
-		} else {
-			throw new NotAuthorizedException();
-		}
-		
-		
+		} 
+		throw new NotAuthorizedException();		
 	}
-/*
-	@GetMapping(path="/{identifiant}")  // version cool de @RequestMapping(path="/{identifiant}", method = RequestMethod.GET) 
-	public ClientFull findOne (@PathVariable(name = "identifiant") Long id) {	
-		return mapper.map(service.findOne(id), ClientFull.class);
+	
 
+	
+	/**
+	 * @param id
+	 * @return the ClientFull that has this id in the database
+	 * this action is only allowed to the administrator or an identified client if he is checking himself
+	 */
+	@GetMapping(path="/{identifiant}")  
+	public ClientFull findOne (@PathVariable(name = "identifiant") Long id) {			
+		if (authChecker.getCurrentAdmin() != null ) {
+			return mapper.map(service.findOne(id), ClientFull.class);
+		}
+		else if  ((authChecker.getCurrentClient() != null)  && (authChecker.getCurrentClient().getId().equals(id)) ) {
+			return mapper.map(service.findOne(id), ClientFull.class);
+		}
+		throw new NotAuthorizedException();	
 	}
-	*/
+	
+	
+	
 	@DeleteMapping(path="/{id}")  
 	public void delete (@PathVariable Long id) {
 		try {

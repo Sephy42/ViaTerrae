@@ -1,9 +1,5 @@
 package com.formation.dto.place;
 
-
-
-
-
 public class PlaceLight {
 	
 	Long id;

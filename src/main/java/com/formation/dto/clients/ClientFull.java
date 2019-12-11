@@ -7,13 +7,13 @@ public class ClientFull {
 
 	private Long id;
 	
-	private String nom;
+	private String name;
 	
-	private String prenom;
+	private String firstName;
 	
-	private Date naissance;
+	private Date birthDate;
 	
-	private String mail;
+	private String email;
 	
 	private String phone;
 	
@@ -35,46 +35,38 @@ public class ClientFull {
 		this.id = id;
 	}
 
-
-	public String getNom() {
-		return nom;
+	
+	public String getName() {
+		return name;
 	}
 
-
-	public void setNom(String nom) {
-		this.nom = nom;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-
-	public String getPrenom() {
-		return prenom;
+	public String getFirstName() {
+		return firstName;
 	}
 
-
-	public void setPrenom(String prenom) {
-		this.prenom = prenom;
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
 	}
 
-
-	public Date getNaissance() {
-		return naissance;
+	public Date getBirthDate() {
+		return birthDate;
 	}
 
-
-	public void setNaissance(Date naissance) {
-		this.naissance = naissance;
+	public void setBirthDate(Date birthDate) {
+		this.birthDate = birthDate;
 	}
 
-
-	public String getMail() {
-		return mail;
+	public String getEmail() {
+		return email;
 	}
 
-
-	public void setMail(String mail) {
-		this.mail = mail;
+	public void setEmail(String email) {
+		this.email = email;
 	}
-
 
 	public String getPhone() {
 		return phone;
