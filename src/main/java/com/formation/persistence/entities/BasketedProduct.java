@@ -23,6 +23,18 @@ public class BasketedProduct {
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "product_id",referencedColumnName = "id", nullable = false)
 	Product product;
+	
+	public BasketedProduct() {
+		}
+
+
+	public BasketedProduct(Integer quantity, String unit, Product product) {
+		super();
+		this.quantity = quantity;
+		this.unit = unit;
+		this.product = product;
+	}
+
 
 	public Long getId() {
 		return id;

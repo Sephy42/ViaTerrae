@@ -80,12 +80,31 @@ public class ClientController {
 	
 	
 	
+	
+	// TODO
+	// mettre des gardes fous, il faut vérifier un tas de trucs avant de pouvoir supprimer un client de la BD pour éviter les fausses manips
+	
+	/**
+	 * @param id
+	 * delete the client with the ID id
+	 * 	this action is only allowed to the administrator or an identified client if he is deleting his own account
+	 */
 	@DeleteMapping(path="/{id}")  
 	public void delete (@PathVariable Long id) {
-		try {
-			service.deleteById(id);
-		} catch (Exception e) {
-			e.printStackTrace();
+		if (authChecker.getCurrentAdmin() != null ) { // je suis l'admin, j'ai le droit
+			try {
+				service.deleteById(id);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}else if  ((authChecker.getCurrentClient() != null)  && (authChecker.getCurrentClient().getId().equals(id)) ) {// je suis un client et je me supprime moi même
+			try {
+				service.deleteById(id);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}else {
+			throw new NotAuthorizedException();	
 		}
 	}
 	
