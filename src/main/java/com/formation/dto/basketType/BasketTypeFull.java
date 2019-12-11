@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.Set;
 
 import com.formation.dto.product.ProductFull;
+import com.formation.dto.product.UsedProduct;
 import com.formation.persistence.entities.BasketedProduct;
 import com.formation.persistence.entities.Picture;
 
@@ -18,8 +19,26 @@ public class BasketTypeFull {
 	private Integer quantityAvailable;
 	private String label;
 	
-	private Set<ProductFull> listProduct;
+	private Set<UsedProduct> listProduct;
 	private Picture picture;
+	
+	public BasketTypeFull() {
+	}
+
+	public BasketTypeFull(Long id, Date beginDate, Date endDate, Double cost, int productCount,
+			Integer quantityAvailable, String label, Set<UsedProduct> listProduct, Picture picture) {
+		this.id = id;
+		this.beginDate = beginDate;
+		this.endDate = endDate;
+		this.cost = cost;
+		ProductCount = productCount;
+		this.quantityAvailable = quantityAvailable;
+		this.label = label;
+		this.listProduct = listProduct;
+		this.picture = picture;
+	}
+
+
 
 	public Picture getPicture() {
 		return picture;
@@ -85,11 +104,11 @@ public class BasketTypeFull {
 		this.label = label;
 	}
 
-	public Set<ProductFull> getListProduct() {
+	public Set<UsedProduct> getListProduct() {
 		return listProduct;
 	}
 
-	public void setListProduct(Set<ProductFull> listProduct) {
+	public void setListProduct(Set<UsedProduct> listProduct) {
 		this.listProduct = listProduct;
 	}
 
