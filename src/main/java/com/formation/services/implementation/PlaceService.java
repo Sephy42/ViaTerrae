@@ -10,7 +10,6 @@ import com.formation.persistence.repository.IPlaceRepository;
 import com.formation.services.IPlaceService;
 import com.formation.services.common.implementation.AbstractService;
 
-
 @Service
 @Transactional
 public class PlaceService extends AbstractService< Place> implements IPlaceService {
