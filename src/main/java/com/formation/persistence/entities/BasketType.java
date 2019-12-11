@@ -35,7 +35,7 @@ public class BasketType {
 	private Set<BasketedProduct> listProduct;
 	
 	@OneToOne(orphanRemoval = true,fetch = FetchType.LAZY)
-	@JoinColumn(name = "picture_id",referencedColumnName = "id")
+	@JoinColumn(name = "picture_id",referencedColumnName = "id", nullable = true)
 	private Picture picture;
 
 	public Picture getPicture() {
