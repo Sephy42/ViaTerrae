@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.formation.dto.clients.ClientFull;
 import com.formation.dto.clients.ClientLight;
 import com.formation.dto.clients.ClientToSave;
+import com.formation.exceptions.NotApplicableException;
 import com.formation.exceptions.NotAuthorizedException;
 import com.formation.persistence.entities.Client;
 import com.formation.services.IAuthChecker;
@@ -65,20 +66,31 @@ public class ClientController {
 	/**
 	 * @param id
 	 * @return the ClientFull that has this id in the database
-	 * this action is only allowed to the administrator or an identified client if he is checking himself
+	 * this action is only allowed to the administrator
 	 */
 	@GetMapping(path="/{identifiant}")  
 	public ClientFull findOne (@PathVariable(name = "identifiant") Long id) {			
 		if (authChecker.getCurrentAdmin() != null ) {
 			return mapper.map(service.findOne(id), ClientFull.class);
 		}
-		else if  ((authChecker.getCurrentClient() != null)  && (authChecker.getCurrentClient().getId().equals(id)) ) {
-			return mapper.map(service.findOne(id), ClientFull.class);
-		}
 		throw new NotAuthorizedException();	
 	}
 	
+	/**
+	 * @return the ClientFull object matching the client sending the request
+	 * this action is only allowed an authenticated client
+	 */
+	@GetMapping(path="/me")
+	public ClientFull findOne() {			
 	
+		if (authChecker.getCurrentClient() != null) {
+			return mapper.map(service.findOne(authChecker.getCurrentClient().getId()), ClientFull.class);
+		}
+		else if (authChecker.getCurrentAdmin() != null ) {
+			throw new NotApplicableException("You must specify an ID");	
+		}
+		throw new NotAuthorizedException();	
+	}
 	
 	
 	// TODO
@@ -87,7 +99,7 @@ public class ClientController {
 	/**
 	 * @param id
 	 * delete the client with the ID id
-	 * 	this action is only allowed to the administrator or an identified client if he is deleting his own account
+	 * 	this action is only allowed to the administrator
 	 */
 	@DeleteMapping(path="/{id}")  
 	public void delete (@PathVariable Long id) {
@@ -97,13 +109,26 @@ public class ClientController {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}else if  ((authChecker.getCurrentClient() != null)  && (authChecker.getCurrentClient().getId().equals(id)) ) {// je suis un client et je me supprime moi même
+		}else {
+			throw new NotAuthorizedException();	
+		}
+	}
+	
+	/**
+	 * delete the client who is sending the request
+	 * 	this action is only allowed to an authenticated client
+	 */
+	@DeleteMapping  
+	public void delete () {
+		if  (authChecker.getCurrentClient() != null) {  
 			try {
-				service.deleteById(id);
+				service.deleteById(authChecker.getCurrentClient().getId());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}else {
+		}else if (authChecker.getCurrentAdmin() != null ) { 
+			throw new NotApplicableException();
+		}else{
 			throw new NotAuthorizedException();	
 		}
 	}
@@ -126,5 +151,31 @@ public class ClientController {
 		throw new NotAuthorizedException();	
 	}
 
+	
+
+
+	/**
+	 * @param id
+	 * @param cl
+	 *//*
+	@PostMapping(path="/update/{id}") 
+	public void update(@PathVariable Long id, @RequestBody ClientFull cl) {
+		if (authChecker.getCurrentAdmin() != null ) { 
+			try {
+				service.deleteById(id);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}else if  ((authChecker.getCurrentClient() != null)  && (authChecker.getCurrentClient().getId().equals(id)) ) {// je suis un client et je me supprime moi même
+			try {
+				service.deleteById(id);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}else {
+			throw new NotAuthorizedException();	
+		}
+	}
+*/
 	
 }
