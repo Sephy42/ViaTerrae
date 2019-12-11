@@ -1,5 +1,8 @@
 package com.formation.controllers;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,18 +13,24 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.formation.config.JwtTokenUtil;
 import com.formation.dto.clients.ClientToSave;
 import com.formation.dto.jwt.JwtRequest;
 import com.formation.dto.jwt.JwtResponse;
+import com.formation.dto.place.PlaceFull;
+import com.formation.dto.place.PlaceLight;
 import com.formation.exceptions.NotAuthorizedException;
 import com.formation.persistence.entities.Client;
 import com.formation.services.IClientService;
+import com.formation.services.IPlaceService;
 
 
 
@@ -29,10 +38,18 @@ import com.formation.services.IClientService;
  * @author Aelion
  * Regroupe l'ensemble des méthodes exposées via webservice ne nécessitant PAS de token d'identification
  */
+/**
+ * @author Aelion
+ *
+ */
 @RestController
 @RequestMapping(path = "/api/public")
 public class PublicController {
 
+	
+	/************/
+	/**** atributs ***/
+	/************/
 
 	@Autowired
 	private ModelMapper mapper;
@@ -54,7 +71,15 @@ public class PublicController {
 	@Autowired
 	private BCryptPasswordEncoder encoder;
 	
-	@PostMapping(value = "/authenticate")
+	@Autowired
+	private IPlaceService servicePlace; 
+	
+	/************/
+	/**** methodes ***/
+	/************/
+	
+	
+	@PostMapping(path = "/authenticate")
 	public ResponseEntity<?> authenticate(@RequestBody JwtRequest authenticationRequest) throws Exception {
 		try {
 			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword()));
@@ -72,7 +97,7 @@ public class PublicController {
 	 * @param cl
 	 * @return the client effectively saved
 	 */
-	@PostMapping(value = "/client") 
+	@PostMapping(path = "/client") 
 	public ClientToSave save(@RequestBody ClientToSave cl) {
 		
 		cl.setPassword(encoder.encode(cl.getPassword()));
@@ -81,5 +106,29 @@ public class PublicController {
 		}
 		return mapper.map(clientService.save(mapper.map(cl, Client.class)), ClientToSave.class);	
 	}
+	
+	
+	/**
+	 * @return list of place
+	 */
+	@GetMapping (path = "/places")
+	public List<PlaceLight> getAll(){
+
+		return servicePlace.findAll()
+				.stream()
+				.map(c -> mapper.map(c, PlaceLight.class))
+				.collect(Collectors.toList()) ; 
+			}
+	
+	
+	/**
+	 * @param id
+	 * @return name and address of a place
+	 */
+	@RequestMapping(path="/places/{identifiant}", method = RequestMethod.GET )
+	public PlaceFull findOne(@PathVariable(name = "identifiant") Long id) {
+           return  mapper.map(servicePlace.findOne(id), PlaceFull.class);
+	}
+
 	
 }
