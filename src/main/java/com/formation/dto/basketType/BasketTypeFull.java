@@ -3,9 +3,7 @@ package com.formation.dto.basketType;
 import java.util.Date;
 import java.util.Set;
 
-import com.formation.dto.product.ProductFull;
 import com.formation.dto.product.UsedProduct;
-import com.formation.persistence.entities.BasketedProduct;
 import com.formation.persistence.entities.Picture;
 
 

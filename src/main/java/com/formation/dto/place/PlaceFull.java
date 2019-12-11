@@ -1,12 +1,5 @@
 package com.formation.dto.place;
 
-
-
-
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
-@Table (name = "places") @Entity
 public class PlaceFull {
 	
 	Long id;

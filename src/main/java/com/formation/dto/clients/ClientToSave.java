@@ -2,40 +2,40 @@ package com.formation.dto.clients;
 
 import java.util.Date;
 
+import javax.validation.constraints.NotNull;
 
-public class ClientFull {
+public class ClientToSave {
 
-	private Long id;
-	
+	@NotNull
 	private String name;
 	
 	private String firstName;
 	
 	private Date birthDate;
-	
+	@NotNull
 	private String email;
 	
 	private String phone;
-	
-	
-	//private Set<CommandeLight> commandes;
-	
-	
+	@NotNull
+	private String password;
 
-	public ClientFull() {
-		//this.commandes = new HashSet<>();
+	
+	
+	public ClientToSave() {
 	}
 
-	public Long getId() {
-		return id;
-	}
-
-
-	public void setId(Long id) {
+	/*public ClientToSave(Long id, String name, String firstName, Date birthDate, String email, String phone,
+			String password) {
 		this.id = id;
-	}
+		this.name = name;
+		this.firstName = firstName;
+		this.birthDate = birthDate;
+		this.email = email;
+		this.phone = phone;
+		this.password = password;
+	}*/
 
-	
+
 	public String getName() {
 		return name;
 	}
@@ -72,21 +72,18 @@ public class ClientFull {
 		return phone;
 	}
 
-
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
 
-
-	/*
-	public Set<CommandeLight> getCommandes() {
-		return commandes;
+	public String getPassword() {
+		return password;
 	}
 
-
-	public void setCommandes(Set<CommandeLight> commandes) {
-		this.commandes = commandes;
+	public void setPassword(String password) {
+		this.password = password;
 	}
-
-*/
+	
+	
+	
 }

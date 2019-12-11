@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,12 +16,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.formation.dto.clients.ClientFull;
 import com.formation.dto.clients.ClientLight;
+import com.formation.dto.clients.ClientToSave;
 import com.formation.exceptions.NotAuthorizedException;
 import com.formation.persistence.entities.Client;
 import com.formation.services.IAuthChecker;
 import com.formation.services.IClientService;
 
 
+/**
+ * @author Aelion
+ *
+ */
 @RestController
 @RequestMapping(path = "/api/private/client")
 public class ClientController {
@@ -35,44 +41,90 @@ public class ClientController {
 	@Autowired
 	private IAuthChecker authChecker;
 	
-	public ClientController() {
-		System.out.println("instanciation du controller de client");
-	}
+	@Autowired
+	private BCryptPasswordEncoder encoder;
+
 	
+	/**
+	 * @return the list of all ClientLight in the database
+	 * this action is only allowed to the administrator and throw an exception if launched by any other user
+	 */
 	@GetMapping
-	public List<ClientLight> findAll(){
-		
+	public List<ClientLight> findAll(){		
 		if (authChecker.getCurrentAdmin() != null ) {
 			return service.findAll()
 					.stream()
 					.map(c -> mapper.map(c, ClientLight.class))
 					.collect(Collectors.toList());
-		} else {
-			throw new NotAuthorizedException();
-		}
-		
-		
+		} 
+		throw new NotAuthorizedException();		
 	}
-/*
-	@GetMapping(path="/{identifiant}")  // version cool de @RequestMapping(path="/{identifiant}", method = RequestMethod.GET) 
-	public ClientFull findOne (@PathVariable(name = "identifiant") Long id) {	
-		return mapper.map(service.findOne(id), ClientFull.class);
+	
 
+	
+	/**
+	 * @param id
+	 * @return the ClientFull that has this id in the database
+	 * this action is only allowed to the administrator or an identified client if he is checking himself
+	 */
+	@GetMapping(path="/{identifiant}")  
+	public ClientFull findOne (@PathVariable(name = "identifiant") Long id) {			
+		if (authChecker.getCurrentAdmin() != null ) {
+			return mapper.map(service.findOne(id), ClientFull.class);
+		}
+		else if  ((authChecker.getCurrentClient() != null)  && (authChecker.getCurrentClient().getId().equals(id)) ) {
+			return mapper.map(service.findOne(id), ClientFull.class);
+		}
+		throw new NotAuthorizedException();	
 	}
-	*/
+	
+	
+	
+	
+	// TODO
+	// mettre des gardes fous, il faut vérifier un tas de trucs avant de pouvoir supprimer un client de la BD pour éviter les fausses manips
+	
+	/**
+	 * @param id
+	 * delete the client with the ID id
+	 * 	this action is only allowed to the administrator or an identified client if he is deleting his own account
+	 */
 	@DeleteMapping(path="/{id}")  
 	public void delete (@PathVariable Long id) {
-		try {
-			service.deleteById(id);
-		} catch (Exception e) {
-			e.printStackTrace();
+		if (authChecker.getCurrentAdmin() != null ) { // je suis l'admin, j'ai le droit
+			try {
+				service.deleteById(id);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}else if  ((authChecker.getCurrentClient() != null)  && (authChecker.getCurrentClient().getId().equals(id)) ) {// je suis un client et je me supprime moi même
+			try {
+				service.deleteById(id);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}else {
+			throw new NotAuthorizedException();	
 		}
 	}
 	
 	
-	@PostMapping() 
-	public ClientFull save(@RequestBody ClientFull cl) {
-		return mapper.map(service.save(mapper.map(cl, Client.class)), ClientFull.class);	
+	/**
+	 * @param cl
+	 * @return the client effectively saved
+	 * this action can only be done by the administrator
+	 */
+	@PostMapping
+	public ClientToSave save(@RequestBody ClientToSave cl) {
+		if (authChecker.getCurrentAdmin() != null ) {
+			cl.setPassword(encoder.encode(cl.getPassword()));
+			if (cl.getFirstName() == null) {
+				cl.setFirstName("Anonyme");
+			}
+			return mapper.map(service.save(mapper.map(cl, Client.class)), ClientToSave.class);	
+		}
+		throw new NotAuthorizedException();	
 	}
+
 	
 }
