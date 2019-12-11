@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.formation.dto.place.PlaceFull;
 import com.formation.dto.place.PlaceLight;
+import com.formation.exceptions.NotAuthorizedException;
 import com.formation.persistence.entities.Place;
+import com.formation.services.IAuthChecker;
 import com.formation.services.IPlaceService;
 
 @RestController
@@ -28,6 +30,10 @@ public class PlaceController {
 
 	@Autowired
 	IPlaceService service;
+	
+	@Autowired
+	private IAuthChecker authchecker;
+	
 
 	@GetMapping 
 	public List<PlaceLight> getAll(){
@@ -45,11 +51,22 @@ public class PlaceController {
 	
 	@DeleteMapping (path = "/{identifiant}")
 	public boolean deleteById(@PathVariable(name = "identifiant") Long id) {
-        return  service.deleteById(id);
+		
+		if (authchecker.getCurrentAdmin() == null) {
+			throw new NotAuthorizedException("Vous n'avez pas les droits pour cette action");
+		}
+		
+		return  service.deleteById(id);
+		
+		
    }
 	
 	@PostMapping
 	public PlaceFull save(@RequestBody PlaceFull placeF) {
+		
+		if (authchecker.getCurrentAdmin() == null) throw new NotAuthorizedException("Vous n'avez pas les droits pour cette action");
+			
+		
 		Place place = mapper.map(placeF, Place.class);
 		place = service.save(place);
 		

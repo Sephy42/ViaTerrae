@@ -7,16 +7,26 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.formation.dto.order.OrderFull;
+import com.formation.dto.order.OrderLight;
+import com.formation.dto.product.ProductFull;
 import com.formation.exceptions.NotAuthorizedException;
 import com.formation.persistence.entities.Admin;
+import com.formation.persistence.entities.BasketedProduct;
 import com.formation.persistence.entities.Client;
 import com.formation.persistence.entities.Order;
+import com.formation.persistence.entities.OrderedBasket;
+import com.formation.persistence.entities.Product;
 import com.formation.services.IAuthChecker;
+import com.formation.services.IBasketTypeService;
+import com.formation.services.IClientService;
 import com.formation.services.IOrderService;
+import com.formation.services.IPlaceService;
 
 @RestController 
 @RequestMapping (path = "api/private/order")
@@ -30,6 +40,15 @@ public class OrderController {
 	
 	@Autowired
 	private IOrderService servOrder;
+	
+	@Autowired
+	private IBasketTypeService servBasket;
+	
+	@Autowired
+	private IClientService servClient;
+	
+	@Autowired
+	private IPlaceService servPlace;
 	
 	
 	/**
@@ -86,6 +105,42 @@ public class OrderController {
 				throw new NotAuthorizedException("Non autorisé !");
 			}
 		}
-
+	}
+	
+	
+	@PostMapping
+	public OrderFull save (@RequestBody OrderLight order) {
+		
+		//Authentification
+		Client client = authChecker.getCurrentClient();
+		
+		if (client != null && !(client.getId().equals(order.getClient()))) {
+			throw new NotAuthorizedException("Non autorisé !");
+		}
+		
+		Order result = new Order ();
+		// add the id and date to the order.
+		result.setId(order.getId());
+		result.setOrderDate(order.getOrderDate());
+		result.setPickupDate(order.getPickupDate());
+		// add cleanly the set of baskets in the order
+		result.getListBaskets().addAll(
+			order.getListBaskets().stream()
+				.map(orderedBasket -> {
+					OrderedBasket opresult = new OrderedBasket ();
+					opresult.setId(orderedBasket.getId());
+					opresult.setQuantity(orderedBasket.getQuantity());
+					opresult.setBasket(servBasket.findOne(orderedBasket.getBasket()));
+					return opresult;
+				})
+				.collect(Collectors.toSet())
+		);
+		System.out.println(result);
+		// add cleanly the client in the order
+		result.setClient(servClient.findOne(order.getClient()));
+		// add cleanly the place in the order
+		result.setPlace(servPlace.findOne(order.getPlace()));
+		
+		return mapper.map(servOrder.save(result),OrderFull.class);
 	}
 }

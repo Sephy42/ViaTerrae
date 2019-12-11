@@ -3,17 +3,14 @@ package com.formation.dto.order;
 import java.util.Date;
 import java.util.List;
 
-import com.formation.dto.clients.ClientLight;
-import com.formation.dto.place.PlaceLight;
-
-public class OrderFull {
+public class OrderLight {
 	
 	Long id;
 	Date orderDate;
 	Date pickupDate;
-	List<OrderedBasketForOrderFull> listBaskets;
-	ClientLight client;
-	PlaceLight place;
+	List<OrderedBasketForOrderLight> listBaskets;
+	Long client;
+	Long place;
 	
 	public Long getId() {
 		return id;
@@ -33,24 +30,25 @@ public class OrderFull {
 	public void setPickupDate(Date pickupDate) {
 		this.pickupDate = pickupDate;
 	}
-	public List<OrderedBasketForOrderFull> getListBaskets() {
+	public List<OrderedBasketForOrderLight> getListBaskets() {
 		return listBaskets;
 	}
-	public void setListBaskets(List<OrderedBasketForOrderFull> listBaskets) {
+	public void setListBaskets(List<OrderedBasketForOrderLight> listBaskets) {
 		this.listBaskets = listBaskets;
 	}
-	public ClientLight getClient() {
-		return client;
-	}
-	public void setClient(ClientLight client) {
-		this.client = client;
-	}
-	public PlaceLight getPlace() {
+	public Long getPlace() {
 		return place;
 	}
-	public void setPlace(PlaceLight place) {
+	public void setPlace(Long place) {
 		this.place = place;
 	}
+	public Long getClient() {
+		return client;
+	}
+	public void setClient(Long client) {
+		this.client = client;
+	}
+	
 	
 	
 }
