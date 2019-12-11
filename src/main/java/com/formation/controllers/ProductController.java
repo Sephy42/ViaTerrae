@@ -18,7 +18,8 @@ import com.formation.persistence.entities.Product;
 import com.formation.services.IProductService;
 
 @RestController
-@RequestMapping(path = "/api/public/product")
+@RequestMapping(path = "/api/private/products")
+
 public class ProductController {
 
 	@Autowired

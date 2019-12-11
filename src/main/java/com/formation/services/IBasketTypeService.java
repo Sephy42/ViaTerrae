@@ -1,11 +1,11 @@
 package com.formation.services;
 
-import java.util.List;
+import java.util.Set;
 
 import com.formation.persistence.entities.BasketType;
-import com.formation.persistence.entities.Product;
+import com.formation.persistence.entities.BasketedProduct;
 import com.formation.services.common.IServiceActions;
 
 public interface IBasketTypeService extends IServiceActions<BasketType>{
-	List<Product> getProductsByBasketType (Long id);
+	Set<BasketedProduct> getProductListByBasketType (Long id);
 }
