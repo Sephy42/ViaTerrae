@@ -21,13 +21,14 @@ public class Category {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public String getTitle() {
+	
+	
+	public String getLabel() {
 		return label;
 	}
-	public void setTitle(String label) {
+	public void setLabel(String label) {
 		this.label = label;
 	}
-	
 	@Override
 	public String toString() {
 		return "Categorie [id=" + id + ", title=" + label + "]";
