@@ -1,6 +1,8 @@
 package com.formation.dto.place;
 
 
+
+
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
