@@ -55,6 +55,7 @@ public class BasketTypeController {
 	}
 	// trouve le panier le retourne, avec une liste réduite de produit visibles
 	@GetMapping(path="/{id}")
+	@ResponseStatus(code = HttpStatus.OK)
 	public BasketTypeFull findById(@PathVariable (value= "id") Long id) {		 
 		  BasketType basket= service.findOne(id);
 		  BasketTypeFull FinalBasket= mapper.map(basket,BasketTypeFull.class);
@@ -74,6 +75,7 @@ public class BasketTypeController {
 	}
 	// modifie ou crée un panier
 	@PostMapping
+	@ResponseStatus(code = HttpStatus.OK)
 	public BasketTypeFull save(@RequestBody BasketTypeToSave basket) {
 		BasketType basketToSave = mapper.map(basket,BasketType.class);
 		basketToSave.getListProduct().clear();
@@ -85,7 +87,7 @@ public class BasketTypeController {
 		return mapper.map(basketSaved, BasketTypeFull.class);
 	}
 
-	// ajoute une photo au panier
+	// ajouter une photo au panier
 	@PostMapping(path="/{id}/picture")
 	@ResponseStatus(code = HttpStatus.OK)
 	public void addPictureToBasketType(@RequestBody PictureToSave picture, @PathVariable (value= "id") Long basketId) {					
@@ -100,8 +102,19 @@ public class BasketTypeController {
 		basket.setPicture(p);
 		service.save(basket);
 	}
+	// supprimer la photo du panier
+	@DeleteMapping(path="/{id}/picture")
+	@ResponseStatus(code = HttpStatus.OK)
+	public void deletePictureToBasketType(@PathVariable (value= "id") Long basketId) {					
+	
+		BasketType basket = service.findOne(basketId);
+		basket.setPicture(null);
+		service.save(basket);
+
+	}
 	
 	@GetMapping(path="/{id}/products")
+	@ResponseStatus(code = HttpStatus.OK)
 	public Set<UsedProduct> getProductListByBasketType(@PathVariable (value= "id") Long id) {
 		return service.getProductListByBasketType(id)
 				.stream()
