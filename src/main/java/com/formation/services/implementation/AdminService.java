@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import com.formation.persistence.entities.Admin;
-import com.formation.persistence.entities.Client;
 import com.formation.persistence.repository.IAdminRepository;
 import com.formation.services.IAdminService;
 import com.formation.services.common.implementation.AbstractService;
