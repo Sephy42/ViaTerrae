@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.formation.config.JwtTokenUtil;
-import com.formation.dto.JwtRequest;
-import com.formation.dto.JwtResponse;
+import com.formation.dto.jwt.JwtRequest;
+import com.formation.dto.jwt.JwtResponse;
 import com.formation.exceptions.NotAuthorizedException;
 
 

@@ -1,4 +1,4 @@
-package com.formation.dto;
+package com.formation.dto.jwt;
 
 import java.io.Serializable;
 
