@@ -10,9 +10,9 @@ import com.formation.persistence.repository.IPictureRepository;
 import com.formation.services.IPictureService;
 import com.formation.services.common.implementation.AbstractService;
 
+
 @Service
 @Transactional
-
 public class PictureService extends AbstractService<Picture> implements IPictureService  {
 	
 	@Autowired

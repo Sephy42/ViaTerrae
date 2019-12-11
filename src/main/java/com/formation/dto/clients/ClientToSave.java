@@ -24,17 +24,6 @@ public class ClientToSave {
 	public ClientToSave() {
 	}
 
-	/*public ClientToSave(Long id, String name, String firstName, Date birthDate, String email, String phone,
-			String password) {
-		this.id = id;
-		this.name = name;
-		this.firstName = firstName;
-		this.birthDate = birthDate;
-		this.email = email;
-		this.phone = phone;
-		this.password = password;
-	}*/
-
 
 	public String getName() {
 		return name;
