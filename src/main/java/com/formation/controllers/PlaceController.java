@@ -44,8 +44,8 @@ public class PlaceController {
 	}
 	
 	@DeleteMapping (path = "/{identifiant}")
-	public PlaceFull deleteById(@PathVariable(name = "identifiant") Long id) {
-        return  mapper.map(service.deleteById(id), PlaceFull.class);
+	public boolean deleteById(@PathVariable(name = "identifiant") Long id) {
+        return  service.deleteById(id);
    }
 	
 	@PostMapping
