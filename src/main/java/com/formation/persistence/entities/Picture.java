@@ -13,7 +13,7 @@ public class Picture {
 	@GeneratedValue (strategy = GenerationType.IDENTITY)
 	Long id;
 	@Column (unique = true, nullable = false)
-	Byte [] picture;
+	byte [] picture;
 	
 	public Long getId() {
 		return id;
@@ -21,10 +21,10 @@ public class Picture {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public Byte[] getPicture() {
+	public byte[] getPicture() {
 		return picture;
 	}
-	public void setPicture(Byte[] picture) {
+	public void setPicture(byte[] picture) {
 		this.picture = picture;
 	}
 }
