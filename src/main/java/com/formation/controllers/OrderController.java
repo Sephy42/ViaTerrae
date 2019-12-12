@@ -15,15 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.formation.dto.order.OrderFull;
 import com.formation.dto.order.OrderLight;
-import com.formation.dto.product.ProductFull;
 import com.formation.exceptions.NotAuthorizedException;
-
-import com.formation.persistence.entities.Admin;
-import com.formation.persistence.entities.BasketedProduct;
 import com.formation.persistence.entities.Client;
 import com.formation.persistence.entities.Order;
 import com.formation.persistence.entities.OrderedBasket;
-import com.formation.persistence.entities.Product;
 import com.formation.services.IAuthChecker;
 import com.formation.services.IBasketTypeService;
 import com.formation.services.IClientService;
