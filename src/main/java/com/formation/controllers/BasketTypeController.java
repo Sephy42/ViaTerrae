@@ -23,100 +23,170 @@ import com.formation.dto.basketType.toSave.BasketTypeToSave;
 import com.formation.dto.picture.PictureToSave;
 import com.formation.dto.product.ProductFull;
 import com.formation.dto.product.UsedProduct;
+import com.formation.exceptions.NotAuthorizedException;
 import com.formation.persistence.entities.BasketType;
 import com.formation.persistence.entities.BasketedProduct;
 import com.formation.persistence.entities.Picture;
+import com.formation.services.IAuthChecker;
 import com.formation.services.IBasketTypeService;
 import com.formation.services.IPictureService;
 import com.formation.services.IProductService;
+import com.formation.services.IVerificationService;
 
+
+/**
+ * @author Aelion
+ *
+ */
 @RestController
 @RequestMapping(path = "/api/public/baskets")
 public class BasketTypeController {
 
 	@Autowired
 	ModelMapper mapper;
-	
+
 	@Autowired
-	IBasketTypeService service;
-	
+	IBasketTypeService basketTypeService;
+
 	@Autowired
 	IProductService serviceProduct;
-	
+
 	@Autowired
 	IPictureService servicePicture;
-	
+
+	@Autowired
+	private IAuthChecker authChecker;
+
+	@Autowired
+	private IVerificationService verificationService;
+
+	/**
+	 * Find all basket type 
+	 * this action is only available for the administrator
+	 */
 	@GetMapping
-	public List<BasketTypeLight> findAll(){		
-	     return service.findAll()
-	    		 .stream()
-	    		 .map(p -> mapper.map(p,BasketTypeLight.class))
-	    		 .collect(Collectors.toList());
+	public List<BasketTypeLight> findAll(){	
+		if (authChecker.getCurrentAdmin() != null ) {
+			return basketTypeService.findAll()
+					.stream()
+					.map(p -> mapper.map(p,BasketTypeLight.class))
+					.collect(Collectors.toList());
+		} 
+		throw new NotAuthorizedException();	
 	}
-	// trouve le panier le retourne, avec une liste réduite de produit visibles
+
+	/**
+	 * @param id
+	 * @return BasketTypeFull
+	 * Find a basketType and show a reduce list of products
+	 */
 	@GetMapping(path="/{id}")
 	@ResponseStatus(code = HttpStatus.OK)
 	public BasketTypeFull findById(@PathVariable (value= "id") Long id) {		 
-		  BasketType basket= service.findOne(id);
-		  BasketTypeFull FinalBasket= mapper.map(basket,BasketTypeFull.class);
-		  int n = basket.getListProduct().size();
-		  FinalBasket.setProductCount(n);
-		  Set<UsedProduct> subListProduit= getProductListByBasketType(id);
-		  if (n>2) {
-			  subListProduit.stream().limit(2);			  
-		  }	  		
-		  FinalBasket.setListProduct( subListProduit);
-		  return FinalBasket;	    	     
+		BasketType basket= basketTypeService.findOne(id);
+		BasketTypeFull FinalBasket= mapper.map(basket,BasketTypeFull.class);
+		int n = basket.getListProduct().size();
+		FinalBasket.setProductCount(n);
+		Set<UsedProduct> subListProduit= getProductListByBasketType(id);
+		if (n>2) {
+			subListProduit.stream().limit(2);			  
+		}	  		
+		FinalBasket.setListProduct( subListProduit);
+		return FinalBasket;	    	     
 	}
-	
+
+
 	@DeleteMapping(path="/{id}")
 	public boolean delete(@PathVariable (value= "id") Long id) {
-		      return service.deleteById(id);	
+		if (authChecker.getCurrentAdmin() != null ) {
+			if(verificationService.isBasketDeletable(basketTypeService.findOne(id))) {
+				return  basketTypeService.deleteById(id);
+			}
+		} 
+		throw new NotAuthorizedException();	
 	}
-	// modifie ou crée un panier
+
+	/**
+	 * @param basket
+	 * @return BasketTypeFul
+	 * create a basketType
+	 * or modify the basketType if there is an Id in the basketTypeToSave
+	 * if the basketType is already in an order, the admin can only modify the quantity available and the cost else throw an exception
+	 * this action is only allowed to the administrator and throw an exception if launched by any other user
+	 */
 	@PostMapping
 	@ResponseStatus(code = HttpStatus.OK)
 	public BasketTypeFull save(@RequestBody BasketTypeToSave basket) {
-		BasketType basketToSave = mapper.map(basket,BasketType.class);
-		basketToSave.getListProduct().clear();
-		basket.getListProductToSave().stream().forEach(productToSave ->{
-			basketToSave.getListProduct()
-			.add(new BasketedProduct(productToSave.getQuantity(), productToSave.getUnit(),serviceProduct.findOne(productToSave.getProductId())));	
-		});
-		BasketType basketSaved = service.save(basketToSave);
-		return mapper.map(basketSaved, BasketTypeFull.class);
+
+		if (authChecker.getCurrentAdmin() != null ) {
+
+			if (verificationService.isBasketSaveable(basket)) {
+				BasketType basketToSave = mapper.map(basket,BasketType.class);
+				basketToSave.getListProduct().clear();
+				basket.getListProductToSave().stream().forEach(productToSave ->{
+					basketToSave.getListProduct()
+					.add(new BasketedProduct(productToSave.getQuantity(), productToSave.getUnit(),serviceProduct.findOne(productToSave.getProductId())));	
+				});
+				BasketType basketSaved = basketTypeService.save(basketToSave);
+				return mapper.map(basketSaved, BasketTypeFull.class);
+			} else {
+				throw new NotAuthorizedException("You are trying to modify something other than the cost or the quantity available in a basket already ordered");
+			}
+		}
+		throw new NotAuthorizedException("Not authorized");
 	}
 
-	// ajouter une photo au panier
+	/**
+	 * @param picture
+	 * @param basketId
+	 * add a picture to a basketType
+	 * this action is only allowed to the administrator and throw an exception if launched by any other user
+	 */
 	@PostMapping(path="/{id}/picture")
 	@ResponseStatus(code = HttpStatus.OK)
 	public void addPictureToBasketType(@RequestBody PictureToSave picture, @PathVariable (value= "id") Long basketId) {					
-		
-		byte imageData[] = Base64.getDecoder().decode(picture.getPicture());
-		
-		Picture p = new Picture();
-		p.setPicture(imageData);
-		
-		
-		BasketType basket = service.findOne(basketId);
-		basket.setPicture(p);
-		service.save(basket);
+		if (authChecker.getCurrentAdmin() != null ) {
+			byte imageData[] = Base64.getDecoder().decode(picture.getPicture());
+
+			Picture p = new Picture();
+			p.setPicture(imageData);
+
+
+			BasketType basket = basketTypeService.findOne(basketId);
+			basket.setPicture(p);
+			basketTypeService.save(basket);
+		}
+		throw new NotAuthorizedException();
 	}
-	// supprimer la photo du panier
+
+	/**
+	 * @param basketId
+	 * delete a picture attached to a basketType
+	 * this action is only allowed to the administrator and throw an exception if launched by any other user
+	 */
 	@DeleteMapping(path="/{id}/picture")
 	@ResponseStatus(code = HttpStatus.OK)
-	public void deletePictureToBasketType(@PathVariable (value= "id") Long basketId) {					
-	
-		BasketType basket = service.findOne(basketId);
-		basket.setPicture(null);
-		service.save(basket);
+	public void deletePictureToBasketType(@PathVariable (value= "id") Long basketId) {	
+
+		if (authChecker.getCurrentAdmin() != null ) {
+
+			BasketType basket = basketTypeService.findOne(basketId);
+			basket.setPicture(null);
+			basketTypeService.save(basket);
+		}
+		throw new NotAuthorizedException();
 
 	}
-	
+	//
+	/**
+	 * @param id
+	 * @return Set of UsedProduct (quantity,unit, product) in a basket
+	 */
 	@GetMapping(path="/{id}/products")
 	@ResponseStatus(code = HttpStatus.OK)
 	public Set<UsedProduct> getProductListByBasketType(@PathVariable (value= "id") Long id) {
-		return service.getProductListByBasketType(id)
+
+		return basketTypeService.getProductListByBasketType(id)
 				.stream()
 				.map(basketedProduct -> new UsedProduct(basketedProduct.getQuantity(),basketedProduct.getUnit(),mapper.map(basketedProduct.getProduct(),ProductFull.class)))
 				.collect(Collectors.toSet());

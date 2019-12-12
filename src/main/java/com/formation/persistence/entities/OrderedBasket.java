@@ -22,12 +22,14 @@ public class OrderedBasket {
 	@JoinColumn(name = "basket_id",referencedColumnName = "id", nullable = false)
 	BasketType basket;
 	
+	Double costOrdered;
+	
 	public OrderedBasket() {
-		
 	}
-		public OrderedBasket(BasketType basket) {
-			setBasket(basket);
-		}
+	
+	public OrderedBasket(BasketType basket) {
+		setBasket(basket);
+	}
 
 	public Long getId() {
 		return id;
@@ -51,7 +53,16 @@ public class OrderedBasket {
 
 	public void setBasket(BasketType basket) {
 		this.basket = basket;
+		setCostOrdered(basket.getCost());
 	}
+	
+	public Double getCostOrdered() {
+		return costOrdered;
+	}
+	public void setCostOrdered(Double costOrdered) {
+		this.costOrdered = costOrdered;
+	}
+	
 	
 	
 }
