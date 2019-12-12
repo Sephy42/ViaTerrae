@@ -27,16 +27,11 @@ import com.formation.services.IClientService;
 import com.formation.services.IOrderService;
 import com.formation.services.IPickUpDateService;
 import com.formation.services.IPlaceService;
+import com.formation.services.verification.IVerificationOrderService;
 
 @RestController 
 @RequestMapping (path = "api/private/order")
 public class OrderController {
-
-	@Value("${delay_before_locking_order}")
-	private int delayBeforeLock;
-	
-	@Value("${delay_before_stopping_order}")
-	private int delayBeforeStop;
 	
 	@Autowired
 	private IAuthChecker authChecker;
@@ -58,6 +53,9 @@ public class OrderController {
 	
 	@Autowired
 	private IPickUpDateService servPickUp;
+	
+	@Autowired
+	private IVerificationOrderService verifOrder;
 	
 	
 	/**
@@ -120,25 +118,23 @@ public class OrderController {
 	@PostMapping
 	public OrderFull save (@RequestBody OrderLight order) {
 		
-		//Authentification
+		//Auth validation
 		Client client = authChecker.getCurrentClient();
-
 		if (client != null && !(client.getId().equals(order.getClient()))) {
 			throw new NotAuthorizedException("Non autorisé !");
 		}
-		
-		Calendar cal = Calendar.getInstance(Locale.FRANCE);
-		if (order.getId() != null) {
-			cal.add(Calendar.DAY_OF_YEAR, -delayBeforeLock);
-		}
-		
-		if (order.getId() == null) {
-			cal.add(Calendar.DAY_OF_YEAR, -delayBeforeStop);
-		}
-		
-		if (order.getPickupDate().before(cal.getTime())) {
+
+		//Validating create case
+		if (order.getId() == null && verifOrder.isOrderCreateable(order)) {
 			throw new NotAuthorizedException("Non autorisé !");
 		}
+		
+		// Validating save case
+		if (order.getId() != null && verifOrder.isOrderSaveable(order)) {
+			throw new NotAuthorizedException("Non autorisé !");
+		}
+		
+
 		
 		Order result = new Order ();
 		// add the id and date to the order.
