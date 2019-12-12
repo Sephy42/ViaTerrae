@@ -17,6 +17,8 @@ public class BasketTypeToSave {
 	
 	
 	public BasketTypeToSave(){
+		this.id=null;
+		
 	}
 	
 	

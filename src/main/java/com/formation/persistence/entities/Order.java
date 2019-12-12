@@ -1,6 +1,7 @@
 package com.formation.persistence.entities;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -22,6 +23,11 @@ public class Order {
 	Long id;
 	@Column (name = "order_date",nullable = false)
 	Date orderDate;
+	
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "pickup_interval_id", referencedColumnName = "id", nullable = true)
+	PickUpDate interval;
+	
 	@Column (name = "pickup_date",nullable = false)
 	Date pickupDate;
 	
@@ -36,6 +42,10 @@ public class Order {
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "place_id", referencedColumnName = "id", nullable = false)
 	Place place;
+	
+	public Order() {
+		listBaskets = new HashSet<OrderedBasket>();
+	}
 
 	public Long getId() {
 		return id;
@@ -83,6 +93,14 @@ public class Order {
 
 	public void setPlace(Place place) {
 		this.place = place;
+	}
+
+	public PickUpDate getInterval() {
+		return interval;
+	}
+
+	public void setInterval(PickUpDate interval) {
+		this.interval = interval;
 	}
 	
 	

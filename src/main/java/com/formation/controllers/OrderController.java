@@ -12,16 +12,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.formation.dto.order.OrderFull;
+import com.formation.dto.order.OrderLight;
 import com.formation.exceptions.NotAuthorizedException;
 import com.formation.persistence.entities.Admin;
 import com.formation.persistence.entities.Client;
 import com.formation.persistence.entities.Order;
+import com.formation.persistence.entities.OrderedBasket;
 import com.formation.services.IAuthChecker;
+import com.formation.services.IBasketTypeService;
+import com.formation.services.IClientService;
 import com.formation.services.IOrderService;
+import com.formation.services.IPickUpDateService;
+import com.formation.services.IPlaceService;
+import com.formation.services.verification.IVerificationOrderService;
 
 @RestController 
 @RequestMapping (path = "api/private/order")
@@ -35,6 +44,21 @@ public class OrderController {
 	
 	@Autowired
 	private IOrderService servOrder;
+	
+	@Autowired
+	private IBasketTypeService servBasket;
+	
+	@Autowired
+	private IClientService servClient;
+	
+	@Autowired
+	private IPlaceService servPlace;
+	
+	@Autowired
+	private IPickUpDateService servPickUp;
+	
+	@Autowired
+	private IVerificationOrderService verifOrder;
 	
 	
 	/**
@@ -91,7 +115,56 @@ public class OrderController {
 				throw new NotAuthorizedException("Non autorisé !");
 			}
 		}
+	}
+	
+	
+	@PostMapping
+	public OrderFull save (@RequestBody OrderLight order) {
+		
+		//Auth validation
+		Client client = authChecker.getCurrentClient();
+		if (client != null && !(client.getId().equals(order.getClient()))) {
+			throw new NotAuthorizedException("Non autorisé !");
+		}
 
+		//Validating create case
+		if (order.getId() == null && verifOrder.isOrderCreateable(order)) {
+			throw new NotAuthorizedException("Non autorisé !");
+		}
+		
+		// Validating save case
+		if (order.getId() != null && verifOrder.isOrderSaveable(order)) {
+			throw new NotAuthorizedException("Non autorisé !");
+		}
+		
+
+		
+		Order result = new Order ();
+		// add the id and date to the order.
+		result.setId(order.getId());
+		result.setOrderDate(order.getOrderDate());
+		result.setPickupDate(order.getPickupDate());
+		// add cleanly the pickup interval in the order
+		result.setInterval(servPickUp.findOne(order.getInterval()));
+		// add cleanly the set of baskets in the order
+		result.getListBaskets().addAll(
+			order.getListBaskets().stream()
+				.map(orderedBasket -> {
+					OrderedBasket opresult = new OrderedBasket ();
+					opresult.setId(orderedBasket.getId());
+					opresult.setQuantity(orderedBasket.getQuantity());
+					opresult.setBasket(servBasket.findOne(orderedBasket.getBasket()));
+					return opresult;
+				})
+				.collect(Collectors.toSet())
+		);
+		System.out.println(result);
+		// add cleanly the client in the order
+		result.setClient(servClient.findOne(order.getClient()));
+		// add cleanly the place in the order
+		result.setPlace(servPlace.findOne(order.getPlace()));
+		
+		return mapper.map(servOrder.save(result),OrderFull.class);
 	}
 	
 	
