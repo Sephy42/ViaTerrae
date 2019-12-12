@@ -74,6 +74,8 @@ public class Client {
 		// TODO Auto-generated method stub
 		return super.equals(obj);
 	}
+	
+	
 
 	
 }

@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.formation.dto.order.OrderFull;
 import com.formation.dto.order.OrderLight;
 import com.formation.exceptions.NotAuthorizedException;
-import com.formation.persistence.entities.Admin;
 import com.formation.persistence.entities.Client;
 import com.formation.persistence.entities.Order;
 import com.formation.persistence.entities.OrderedBasket;
@@ -174,13 +173,13 @@ public class OrderController {
 		//if (authChecker.getCurrentClient() == null && authChecker.getCurrentAdmin() == null) throw new NotAuthorizedException("Vous n'avez pas les droits pour cette action");
 		
 		Client me = authChecker.getCurrentClient();
-		Admin admin = authChecker.getCurrentAdmin();
-		
+				
 			
 			Order order = servOrder.findOne(id);
 			
-			if (order.getClient().equals(me) || admin != null) 
-			{
+			if (me != null && !order.getClient().equals(me)) throw new NotAuthorizedException("Vous n'avez pas les droits pour cette action");
+			//Si c'est un client mais pas celui qui a passé la commande, alors on n'a pas les droits
+			
 				Order currentOrder = servOrder.findOne(id); 
 				OrderFull currentOrderF = mapper.map(currentOrder, OrderFull.class);
 				Date pickupDate = currentOrderF.getPickupDate();
@@ -197,12 +196,6 @@ public class OrderController {
 				return servOrder.deleteById(id);
 				
 		
-				}
-					else {
-						throw new NotAuthorizedException("Vous n'avez pas les droits pour cette action");
-			
-			}
-
 
 	
 	
