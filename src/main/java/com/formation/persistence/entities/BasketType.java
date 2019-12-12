@@ -37,7 +37,13 @@ public class BasketType {
 	
 	@OneToOne(orphanRemoval = true,fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "picture_id",referencedColumnName = "id",nullable = true)
+	
+	
 	private Picture picture;
+
+	public BasketType() {
+		this.quantityAvailable = 0;
+	}
 
 	public Picture getPicture() {
 		return picture;
