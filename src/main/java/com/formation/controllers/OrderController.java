@@ -1,10 +1,15 @@
 package com.formation.controllers;
 
+import java.time.LocalDateTime;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -88,4 +93,32 @@ public class OrderController {
 		}
 
 	}
+	
+	
+	@DeleteMapping (path = "/{id}")
+	public boolean deleteById(@PathVariable Long id) {
+				
+		if (authChecker.getCurrentClient() == null && authChecker.getCurrentAdmin() == null) throw new NotAuthorizedException("Vous n'avez pas les droits pour cette action");
+		
+	
+		Order currentOrder = servOrder.findOne(id); 
+		OrderFull currentOrderF = mapper.map(currentOrder, OrderFull.class);
+		Date pickupDate = currentOrderF.getPickupDate();
+	
+		Calendar cal = Calendar.getInstance(Locale.FRANCE); //créer un calendrier avec la logique et la géographie française
+		cal.setTime(pickupDate); //on se positionne sur une date précise
+		cal.add(Calendar.DAY_OF_YEAR, -1); //on se décalle de -1 jour
+		
+		if (System.currentTimeMillis() > cal.getTimeInMillis())  throw new NotAuthorizedException("Il est trop tard pour annuler votre commande.");
+		//System.currentTimeMillis() : récupère l'instant présent en miliseconde calculé depuis un instant donné sans notion de géographie.
+		//cal.getTimeInMillis() : convertit cal en temps de miliseconde calculé depuis un instant donné sans notion de géographie.
+		// t1 > t2 : compare deux dates entre elles. 
+		
+		return servOrder.deleteById(id);
+		
+	}
+	
+	
+	
+	
 }
