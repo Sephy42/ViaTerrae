@@ -26,6 +26,7 @@ import com.formation.services.IAuthChecker;
 import com.formation.services.IBasketTypeService;
 import com.formation.services.IClientService;
 import com.formation.services.IOrderService;
+import com.formation.services.IPickUpDateService;
 import com.formation.services.IPlaceService;
 
 @RestController 
@@ -49,6 +50,9 @@ public class OrderController {
 	
 	@Autowired
 	private IPlaceService servPlace;
+	
+	@Autowired
+	private IPickUpDateService servPickUp;
 	
 	
 	/**
@@ -123,6 +127,8 @@ public class OrderController {
 		result.setId(order.getId());
 		result.setOrderDate(order.getOrderDate());
 		result.setPickupDate(order.getPickupDate());
+		// add cleanly the pickup interval in the order
+		result.setInterval(servPickUp.findOne(order.getInterval()));
 		// add cleanly the set of baskets in the order
 		result.getListBaskets().addAll(
 			order.getListBaskets().stream()

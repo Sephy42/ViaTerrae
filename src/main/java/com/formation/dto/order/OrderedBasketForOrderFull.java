@@ -1,12 +1,12 @@
 package com.formation.dto.order;
 
-import com.formation.dto.basketType.BasketTypeFull;
+import com.formation.dto.basketType.BasketTypeLight;
 
 public class OrderedBasketForOrderFull {
 	
 	Long id;
 	Double quantity;
-	BasketTypeFull basket;
+	BasketTypeLight basket;
 	Double costOrdered;
 	
 	public Long getId() {
@@ -21,10 +21,10 @@ public class OrderedBasketForOrderFull {
 	public void setQuantity(Double quantity) {
 		this.quantity = quantity;
 	}
-	public BasketTypeFull getBasket() {
+	public BasketTypeLight getBasket() {
 		return basket;
 	}
-	public void setBasket(BasketTypeFull basket) {
+	public void setBasket(BasketTypeLight basket) {
 		this.basket = basket;
 	}
 	public Double getCostOrdered() {
