@@ -25,8 +25,8 @@ public class BasketedProduct {
 	Product product;
 	
 	public BasketedProduct() {
-		}
-
+		
+	}
 
 	public BasketedProduct(Integer quantity, String unit, Product product) {
 		super();
@@ -34,7 +34,6 @@ public class BasketedProduct {
 		this.unit = unit;
 		this.product = product;
 	}
-
 
 	public Long getId() {
 		return id;

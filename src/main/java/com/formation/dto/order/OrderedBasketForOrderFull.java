@@ -7,6 +7,7 @@ public class OrderedBasketForOrderFull {
 	Long id;
 	Double quantity;
 	BasketTypeFull basket;
+	Double costOrdered;
 	
 	public Long getId() {
 		return id;
@@ -26,4 +27,11 @@ public class OrderedBasketForOrderFull {
 	public void setBasket(BasketTypeFull basket) {
 		this.basket = basket;
 	}
+	public Double getCostOrdered() {
+		return costOrdered;
+	}
+	public void setCostOrdered(Double costOrdered) {
+		this.costOrdered = costOrdered;
+	}
+	
 }
