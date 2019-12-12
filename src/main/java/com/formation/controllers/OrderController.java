@@ -1,10 +1,13 @@
 package com.formation.controllers;
 
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,14 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.formation.dto.order.OrderFull;
 import com.formation.dto.order.OrderLight;
-import com.formation.dto.product.ProductFull;
 import com.formation.exceptions.NotAuthorizedException;
-import com.formation.persistence.entities.Admin;
-import com.formation.persistence.entities.BasketedProduct;
 import com.formation.persistence.entities.Client;
 import com.formation.persistence.entities.Order;
 import com.formation.persistence.entities.OrderedBasket;
-import com.formation.persistence.entities.Product;
 import com.formation.services.IAuthChecker;
 import com.formation.services.IBasketTypeService;
 import com.formation.services.IClientService;
@@ -32,6 +31,12 @@ import com.formation.services.IPlaceService;
 @RestController 
 @RequestMapping (path = "api/private/order")
 public class OrderController {
+
+	@Value("${delay_before_locking_order}")
+	private int delayBeforeLock;
+	
+	@Value("${delay_before_stopping_order}")
+	private int delayBeforeStop;
 	
 	@Autowired
 	private IAuthChecker authChecker;
@@ -117,8 +122,21 @@ public class OrderController {
 		
 		//Authentification
 		Client client = authChecker.getCurrentClient();
-		
+
 		if (client != null && !(client.getId().equals(order.getClient()))) {
+			throw new NotAuthorizedException("Non autorisé !");
+		}
+		
+		Calendar cal = Calendar.getInstance(Locale.FRANCE);
+		if (order.getId() != null) {
+			cal.add(Calendar.DAY_OF_YEAR, -delayBeforeLock);
+		}
+		
+		if (order.getId() == null) {
+			cal.add(Calendar.DAY_OF_YEAR, -delayBeforeStop);
+		}
+		
+		if (order.getPickupDate().before(cal.getTime())) {
 			throw new NotAuthorizedException("Non autorisé !");
 		}
 		
