@@ -1,11 +1,15 @@
 package com.formation.controllers;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import org.aspectj.weaver.ast.Not;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,20 +19,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.formation.dto.order.OrderFull;
 import com.formation.dto.order.OrderLight;
-import com.formation.dto.product.ProductFull;
 import com.formation.exceptions.NotAuthorizedException;
 
 import com.formation.persistence.entities.Admin;
-import com.formation.persistence.entities.BasketedProduct;
 import com.formation.persistence.entities.Client;
 import com.formation.persistence.entities.Order;
 import com.formation.persistence.entities.OrderedBasket;
-import com.formation.persistence.entities.Product;
 import com.formation.services.IAuthChecker;
 import com.formation.services.IBasketTypeService;
 import com.formation.services.IClientService;
 import com.formation.services.IOrderService;
+import com.formation.services.IPickUpDateService;
 import com.formation.services.IPlaceService;
+import com.formation.services.verification.IVerificationOrderService;
 
 @RestController 
 @RequestMapping (path = "api/private/order")
@@ -51,6 +54,12 @@ public class OrderController {
 	
 	@Autowired
 	private IPlaceService servPlace;
+	
+	@Autowired
+	private IPickUpDateService servPickUp;
+	
+	@Autowired
+	private IVerificationOrderService verifOrder;
 	
 	
 	/**
@@ -113,18 +122,31 @@ public class OrderController {
 	@PostMapping
 	public OrderFull save (@RequestBody OrderLight order) {
 		
-		//Authentification
+		//Auth validation
 		Client client = authChecker.getCurrentClient();
-		
 		if (client != null && !(client.getId().equals(order.getClient()))) {
 			throw new NotAuthorizedException("Non autorisÃ© !");
 		}
+
+		//Validating create case
+		if (order.getId() == null && verifOrder.isOrderCreateable(order)) {
+			throw new NotAuthorizedException("Non autorisÃ© !");
+		}
+		
+		// Validating save case
+		if (order.getId() != null && verifOrder.isOrderSaveable(order)) {
+			throw new NotAuthorizedException("Non autorisÃ© !");
+		}
+		
+
 		
 		Order result = new Order ();
 		// add the id and date to the order.
 		result.setId(order.getId());
 		result.setOrderDate(order.getOrderDate());
 		result.setPickupDate(order.getPickupDate());
+		// add cleanly the pickup interval in the order
+		result.setInterval(servPickUp.findOne(order.getInterval()));
 		// add cleanly the set of baskets in the order
 		result.getListBaskets().addAll(
 			order.getListBaskets().stream()
@@ -145,4 +167,51 @@ public class OrderController {
 		
 		return mapper.map(servOrder.save(result),OrderFull.class);
 	}
+	
+	
+	@DeleteMapping (path = "/{id}")
+	public boolean deleteById(@PathVariable Long id) {
+				
+		//if (authChecker.getCurrentClient() == null && authChecker.getCurrentAdmin() == null) throw new NotAuthorizedException("Vous n'avez pas les droits pour cette action");
+		
+		Client me = authChecker.getCurrentClient();
+		Admin admin = authChecker.getCurrentAdmin();
+		
+			
+			Order order = servOrder.findOne(id);
+			
+			if (order.getClient().equals(me) || admin != null) 
+			{
+				Order currentOrder = servOrder.findOne(id); 
+				OrderFull currentOrderF = mapper.map(currentOrder, OrderFull.class);
+				Date pickupDate = currentOrderF.getPickupDate();
+			
+				Calendar cal = Calendar.getInstance(Locale.FRANCE); //créer un calendrier avec la logique et la géographie française
+				cal.setTime(pickupDate); //on se positionne sur une date précise
+				cal.add(Calendar.DAY_OF_YEAR, -1); //on se décalle de -1 jour
+				
+				if (System.currentTimeMillis() > cal.getTimeInMillis())  throw new NotAuthorizedException("Il est trop tard pour annuler votre commande.");
+				//System.currentTimeMillis() : récupère l'instant présent en miliseconde calculé depuis un instant donné sans notion de géographie.
+				//cal.getTimeInMillis() : convertit cal en temps de miliseconde calculé depuis un instant donné sans notion de géographie.
+				// t1 > t2 : compare deux dates entre elles. 
+				
+				return servOrder.deleteById(id);
+				
+		
+				}
+					else {
+						throw new NotAuthorizedException("Vous n'avez pas les droits pour cette action");
+			
+			}
+
+
+	
+	
+
+		
+	}
+	
+	
+	
+	
 }

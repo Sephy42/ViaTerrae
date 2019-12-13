@@ -4,12 +4,14 @@ import java.util.Date;
 import java.util.List;
 
 import com.formation.dto.clients.ClientLight;
+import com.formation.dto.pickUpDate.PickUpDateFull;
 import com.formation.dto.place.PlaceLight;
 
 public class OrderFull {
 	
 	Long id;
 	Date orderDate;
+	PickUpDateFull interval;
 	Date pickupDate;
 	List<OrderedBasketForOrderFull> listBaskets;
 	ClientLight client;
@@ -50,6 +52,12 @@ public class OrderFull {
 	}
 	public void setPlace(PlaceLight place) {
 		this.place = place;
+	}
+	public PickUpDateFull getInterval() {
+		return interval;
+	}
+	public void setInterval(PickUpDateFull interval) {
+		this.interval = interval;
 	}
 	
 	

@@ -23,6 +23,11 @@ public class Order {
 	Long id;
 	@Column (name = "order_date",nullable = false)
 	Date orderDate;
+	
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "pickup_interval_id", referencedColumnName = "id", nullable = true)
+	PickUpDate interval;
+	
 	@Column (name = "pickup_date",nullable = false)
 	Date pickupDate;
 	
@@ -88,6 +93,14 @@ public class Order {
 
 	public void setPlace(Place place) {
 		this.place = place;
+	}
+
+	public PickUpDate getInterval() {
+		return interval;
+	}
+
+	public void setInterval(PickUpDate interval) {
+		this.interval = interval;
 	}
 	
 	

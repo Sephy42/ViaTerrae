@@ -7,6 +7,7 @@ public class OrderLight {
 	
 	Long id;
 	Date orderDate;
+	Long interval;
 	Date pickupDate;
 	List<OrderedBasketForOrderLight> listBaskets;
 	Long client;
@@ -47,6 +48,12 @@ public class OrderLight {
 	}
 	public void setClient(Long client) {
 		this.client = client;
+	}
+	public Long getInterval() {
+		return interval;
+	}
+	public void setInterval(Long interval) {
+		this.interval = interval;
 	}
 	
 	
