@@ -2,7 +2,6 @@ package com.formation.dto.product;
 
 public class UsedProduct {
 
-	Long id;
 	Integer quantity;
 	String unit;
 	ProductFull product;
@@ -18,13 +17,6 @@ public class UsedProduct {
 	}
 
 
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
 
 	public Integer getQuantity() {
 		return quantity;

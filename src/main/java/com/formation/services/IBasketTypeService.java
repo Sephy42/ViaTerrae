@@ -26,4 +26,9 @@ public interface IBasketTypeService extends IServiceActions<BasketType>{
      * compare the product's set of a basketToSave to the one in a basketType
      */
     boolean equals(Set<UsedProduct> setUsedProduct, Set<BasketedProduct> setBasketedProduct);
+    
+    /**
+     * @return list of baskets available for the current week
+     */
+    public Set<BasketType> BasketsForToday();
 }

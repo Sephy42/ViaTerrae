@@ -1,6 +1,7 @@
 package com.formation.controllers;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.formation.config.JwtTokenUtil;
+import com.formation.dto.basketType.BasketTypeFull;
 import com.formation.dto.clients.ClientToSave;
 import com.formation.dto.jwt.JwtRequest;
 import com.formation.dto.jwt.JwtResponse;
@@ -29,6 +31,7 @@ import com.formation.dto.place.PlaceFull;
 import com.formation.dto.place.PlaceLight;
 import com.formation.exceptions.NotAuthorizedException;
 import com.formation.persistence.entities.Client;
+import com.formation.services.IBasketTypeService;
 import com.formation.services.IClientService;
 import com.formation.services.IPlaceService;
 
@@ -73,6 +76,9 @@ public class PublicController {
 	
 	@Autowired
 	private IPlaceService servicePlace; 
+	
+	@Autowired
+	private IBasketTypeService basketTypeService;
 	
 	/************/
 	/**** methodes ***/
@@ -130,5 +136,18 @@ public class PublicController {
            return  mapper.map(servicePlace.findOne(id), PlaceFull.class);
 	}
 
+	/**
+	 * @return list of basketTypes available for the current week
+	 */
+	@GetMapping (path = "/baskets")
+	public Set<BasketTypeFull> BasketsForWeek(){
+		Set<BasketTypeFull> basketSet= basketTypeService.BasketsForToday().stream()
+		  .map(b -> mapper.map(b,BasketTypeFull.class))
+		  .collect(Collectors.toSet());
+		basketSet.stream().forEach(b -> b.setProductCount(b.getListProduct().size()));
+		return basketSet;
+	}
+	
+	
 	
 }

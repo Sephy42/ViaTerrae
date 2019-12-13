@@ -25,6 +25,7 @@ import com.formation.services.common.implementation.AbstractService;
 
 		@Autowired
 		IBasketTypeRepository repo;
+		
 		@Autowired
 		IOrderedBasketRepository orderedBasketrepo;
 
@@ -51,7 +52,6 @@ import com.formation.services.common.implementation.AbstractService;
 		}
 
 
-		@Override
 		public boolean equals(Set<UsedProduct> setUsedProduct, Set<BasketedProduct> setBasketedProduct) {
 			Set<UsedProduct> setUsedProduct2= new HashSet<UsedProduct>();
 			setBasketedProduct.stream().forEach(basketedProduct -> 
@@ -61,6 +61,19 @@ import com.formation.services.common.implementation.AbstractService;
 			}
 			return false;
 		}
+
+
+		public Set<BasketType> BasketsForToday() {
+			Set<BasketType> basketsForToday= new HashSet<BasketType>();
+			
+			 repo.findAll().stream().forEach(b ->{
+				 if ((b.getEndDate().getTime()) >= System.currentTimeMillis() && b.getBeginDate().getTime()<= System.currentTimeMillis()) {
+					 basketsForToday.add(b); 
+				 };
+			 });			 
+			 return basketsForToday;
+		}
+
 
 
 	}
