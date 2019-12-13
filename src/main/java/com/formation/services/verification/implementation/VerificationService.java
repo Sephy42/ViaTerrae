@@ -12,17 +12,23 @@ import org.springframework.transaction.annotation.Transactional;
 import com.formation.dto.basketType.toSave.BasketTypeToSave;
 import com.formation.dto.order.OrderLight;
 import com.formation.persistence.entities.BasketType;
+import com.formation.persistence.entities.Order;
+import com.formation.persistence.entities.Product;
 import com.formation.services.IBasketTypeService;
+import com.formation.services.IProductService;
 import com.formation.services.verification.IVerificationService;
 
 @Service
 @Transactional
-public class VerificationService implements IVerificationService{
+public class VerificationService implements IVerificationService {
 	
 	// BASKET VERIFICATIONS
 	
 	@Autowired
 	IBasketTypeService basketTypeService;
+	
+	@Autowired
+	IProductService productService;
 	
 	@Autowired
 	ModelMapper mapper;
@@ -47,6 +53,15 @@ public class VerificationService implements IVerificationService{
 		}
 		return false;
 	}
+	
+	
+	
+	public boolean isProductDeletable(Product product) {
+		if (productService.findBasketedProducts(product.getId()).isEmpty()== true) {
+			return true;			
+		}
+		return false;
+	}
 
 
 	// ORDER VERIFICATIONS
@@ -57,7 +72,7 @@ public class VerificationService implements IVerificationService{
 	@Value("${delay_before_stopping_order}")
 	private int delayBeforeStop;
 
-	public boolean isOrderSaveable (OrderLight order) {
+	public boolean isOrderSaveable (Order order) {
 		
 		Calendar cal = Calendar.getInstance(Locale.FRANCE); //Create a calendar at the French locale timezone
 		cal.setTime(order.getPickupDate()); // choose a precise date
@@ -70,7 +85,7 @@ public class VerificationService implements IVerificationService{
 		// t1 > t2 : compare two values : TRUE if t1 strictly superior to t2, FALSE otherwise 
 	}
 	
-	public boolean isOrderCreateable (OrderLight order) {
+	public boolean isOrderCreateable (Order order) {
 		
 		Calendar cal = Calendar.getInstance(Locale.FRANCE); //Create a calendar at the French locale timezone
 		cal.setTime(order.getPickupDate()); // choose a precise date

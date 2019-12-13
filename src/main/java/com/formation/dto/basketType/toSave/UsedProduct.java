@@ -3,7 +3,7 @@ package com.formation.dto.basketType.toSave;
 public class UsedProduct {
 
 	Long id;
-	Integer quantity;
+	Double quantity;
 	String unit;
 	Long productId;
 
@@ -11,7 +11,7 @@ public class UsedProduct {
 		
 	}
 	
-	public UsedProduct(Integer quantity, String unit, Long productId) {
+	public UsedProduct(Double quantity, String unit, Long productId) {
 		this.quantity = quantity;
 		this.unit = unit;
 		this.productId = productId;
@@ -26,11 +26,11 @@ public class UsedProduct {
 		this.id = id;
 	}
 
-	public Integer getQuantity() {
+	public Double getQuantity() {
 		return quantity;
 	}
 
-	public void setQuantity(Integer quantity) {
+	public void setQuantity(Double quantity) {
 		this.quantity = quantity;
 	}
 

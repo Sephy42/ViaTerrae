@@ -16,7 +16,7 @@ public class BasketedProduct {
 	@GeneratedValue (strategy = GenerationType.IDENTITY)
 	Long id;
 	@Column (nullable = false)
-	Integer quantity;
+	Double quantity;
 	@Column (nullable = false)
 	String unit;
 	
@@ -28,7 +28,7 @@ public class BasketedProduct {
 		
 	}
 
-	public BasketedProduct(Integer quantity, String unit, Product product) {
+	public BasketedProduct(Double quantity, String unit, Product product) {
 		super();
 		this.quantity = quantity;
 		this.unit = unit;
@@ -43,11 +43,11 @@ public class BasketedProduct {
 		this.id = id;
 	}
 
-	public Integer getQuantity() {
+	public Double getQuantity() {
 		return quantity;
 	}
 
-	public void setQuantity(Integer quantity) {
+	public void setQuantity(Double quantity) {
 		this.quantity = quantity;
 	}
 

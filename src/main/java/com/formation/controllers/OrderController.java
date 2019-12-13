@@ -128,24 +128,23 @@ public class OrderController {
 		if (client != null && !(client.getId().equals(order.getClient()))) {
 			throw new NotAuthorizedException("Non autorisé !");
 		}
-
-		//Validating create case
-		if (order.getId() == null && verifOrder.isOrderCreateable(order)) {
-			throw new NotAuthorizedException("Non autorisé !");
-		}
-		
-		// Validating save case
-		if (order.getId() != null && verifOrder.isOrderSaveable(order)) {
-			throw new NotAuthorizedException("Non autorisé !");
-		}
-		
-
 		
 		Order result = new Order ();
 		// add the id and date to the order.
 		result.setId(order.getId());
 		result.setOrderDate(order.getOrderDate());
 		result.setPickupDate(order.getPickupDate());
+		
+		//Validating create case
+		if (order.getId() == null && verifOrder.isOrderCreateable(result)) {
+			throw new NotAuthorizedException("Il est trop tard pour créer une commande !");
+		}
+		
+		// Validating save case
+		if (order.getId() != null && verifOrder.isOrderSaveable(result)) {
+			throw new NotAuthorizedException("Il est trop tard pour sauvegarder une commande !");
+		}
+		
 		// add cleanly the pickup interval in the order
 		result.setInterval(servPickUp.findOne(order.getInterval()));
 		// add cleanly the set of baskets in the order
@@ -183,11 +182,7 @@ public class OrderController {
 			
 			if (order.getClient().equals(me) || admin != null) 
 			{
-				Order currentOrder = servOrder.findOne(id); 
-				OrderFull currentOrderF = mapper.map(currentOrder, OrderFull.class);
-				Date pickupDate = currentOrderF.getPickupDate();
-				
-				if (verifOrder.isOrderSaveable(mapper.map(order,OrderLight.class)))  throw new NotAuthorizedException("Il est trop tard pour annuler votre commande.");
+				if (verifOrder.isOrderSaveable(order))  throw new NotAuthorizedException("Il est trop tard pour annuler votre commande.");
 				
 				return servOrder.deleteById(id);
 				
