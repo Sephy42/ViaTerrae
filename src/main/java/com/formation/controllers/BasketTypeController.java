@@ -31,15 +31,12 @@ import com.formation.services.IAuthChecker;
 import com.formation.services.IBasketTypeService;
 import com.formation.services.IPictureService;
 import com.formation.services.IProductService;
-import com.formation.services.IVerificationService;
+import com.formation.services.IVerificationBasketTypeService;
 
 
-/**
- * @author Aelion
- *
- */
+
 @RestController
-@RequestMapping(path = "/api/public/baskets")
+@RequestMapping(path = "/api/private/baskets")
 public class BasketTypeController {
 
 	@Autowired
@@ -58,7 +55,7 @@ public class BasketTypeController {
 	private IAuthChecker authChecker;
 
 	@Autowired
-	private IVerificationService verificationService;
+	private IVerificationBasketTypeService verificationService;
 
 	/**
 	 * Find all basket type 
@@ -78,7 +75,7 @@ public class BasketTypeController {
 	/**
 	 * @param id
 	 * @return BasketTypeFull
-	 * Find a basketType and show a reduce list of products
+	 * Find a basketType 
 	 */
 	@GetMapping(path="/{id}")
 	@ResponseStatus(code = HttpStatus.OK)
@@ -87,11 +84,6 @@ public class BasketTypeController {
 		BasketTypeFull FinalBasket= mapper.map(basket,BasketTypeFull.class);
 		int n = basket.getListProduct().size();
 		FinalBasket.setProductCount(n);
-		Set<UsedProduct> subListProduit= getProductListByBasketType(id);
-		if (n>2) {
-			subListProduit.stream().limit(2);			  
-		}	  		
-		FinalBasket.setListProduct( subListProduit);
 		return FinalBasket;	    	     
 	}
 
@@ -99,11 +91,13 @@ public class BasketTypeController {
 	@DeleteMapping(path="/{id}")
 	public boolean delete(@PathVariable (value= "id") Long id) {
 		if (authChecker.getCurrentAdmin() != null ) {
-			if(verificationService.isBasketDeletable(basketTypeService.findOne(id))) {
+			if(verificationService.isBasketDeletable(basketTypeService.findOne(id))==true) {
 				return  basketTypeService.deleteById(id);
+			}else {
+				throw new NotAuthorizedException("Could not delete, because the basket is already ordered");
 			}
 		} 
-		throw new NotAuthorizedException();	
+		throw new NotAuthorizedException("Not authorized");	
 	}
 
 	/**
@@ -120,7 +114,7 @@ public class BasketTypeController {
 
 		if (authChecker.getCurrentAdmin() != null ) {
 
-			if (verificationService.isBasketSaveable(basket)) {
+			if (verificationService.isBasketSaveable(basket)==true) {
 				BasketType basketToSave = mapper.map(basket,BasketType.class);
 				basketToSave.getListProduct().clear();
 				basket.getListProductToSave().stream().forEach(productToSave ->{
@@ -130,10 +124,11 @@ public class BasketTypeController {
 				BasketType basketSaved = basketTypeService.save(basketToSave);
 				return mapper.map(basketSaved, BasketTypeFull.class);
 			} else {
-				throw new NotAuthorizedException("You are trying to modify something other than the cost or the quantity available in a basket already ordered");
+				throw new NotAuthorizedException("You are trying to modify something in a basket already ordered");
 			}
-		}
+		}else {
 		throw new NotAuthorizedException("Not authorized");
+		}
 	}
 
 	/**
@@ -155,8 +150,9 @@ public class BasketTypeController {
 			BasketType basket = basketTypeService.findOne(basketId);
 			basket.setPicture(p);
 			basketTypeService.save(basket);
-		}
+		}else {
 		throw new NotAuthorizedException();
+		}
 	}
 
 	/**
@@ -173,8 +169,9 @@ public class BasketTypeController {
 			BasketType basket = basketTypeService.findOne(basketId);
 			basket.setPicture(null);
 			basketTypeService.save(basket);
-		}
+		}else {
 		throw new NotAuthorizedException();
+		}
 
 	}
 	//
