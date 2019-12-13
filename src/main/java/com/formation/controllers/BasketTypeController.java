@@ -31,7 +31,7 @@ import com.formation.services.IAuthChecker;
 import com.formation.services.IBasketTypeService;
 import com.formation.services.IPictureService;
 import com.formation.services.IProductService;
-import com.formation.services.IVerificationBasketTypeService;
+import com.formation.services.verification.IVerificationService;
 
 
 
@@ -55,7 +55,7 @@ public class BasketTypeController {
 	private IAuthChecker authChecker;
 
 	@Autowired
-	private IVerificationBasketTypeService verificationService;
+	private IVerificationService verificationService;
 
 	/**
 	 * Find all basket type 

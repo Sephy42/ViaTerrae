@@ -31,7 +31,8 @@ import com.formation.services.IClientService;
 import com.formation.services.IOrderService;
 import com.formation.services.IPickUpDateService;
 import com.formation.services.IPlaceService;
-import com.formation.services.verification.IVerificationOrderService;
+import com.formation.services.verification.IVerificationService;
+
 
 @RestController 
 @RequestMapping (path = "api/private/order")
@@ -59,7 +60,7 @@ public class OrderController {
 	private IPickUpDateService servPickUp;
 	
 	@Autowired
-	private IVerificationOrderService verifOrder;
+	private IVerificationService verifOrder;
 	
 	
 	/**
@@ -185,15 +186,8 @@ public class OrderController {
 				Order currentOrder = servOrder.findOne(id); 
 				OrderFull currentOrderF = mapper.map(currentOrder, OrderFull.class);
 				Date pickupDate = currentOrderF.getPickupDate();
-			
-				Calendar cal = Calendar.getInstance(Locale.FRANCE); //créer un calendrier avec la logique et la géographie française
-				cal.setTime(pickupDate); //on se positionne sur une date précise
-				cal.add(Calendar.DAY_OF_YEAR, -1); //on se décalle de -1 jour
 				
-				if (System.currentTimeMillis() > cal.getTimeInMillis())  throw new NotAuthorizedException("Il est trop tard pour annuler votre commande.");
-				//System.currentTimeMillis() : récupère l'instant présent en miliseconde calculé depuis un instant donné sans notion de géographie.
-				//cal.getTimeInMillis() : convertit cal en temps de miliseconde calculé depuis un instant donné sans notion de géographie.
-				// t1 > t2 : compare deux dates entre elles. 
+				if (verifOrder.isOrderSaveable(mapper.map(order,OrderLight.class)))  throw new NotAuthorizedException("Il est trop tard pour annuler votre commande.");
 				
 				return servOrder.deleteById(id);
 				
