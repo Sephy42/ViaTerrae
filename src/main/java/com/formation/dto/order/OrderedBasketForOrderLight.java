@@ -3,7 +3,7 @@ package com.formation.dto.order;
 public class OrderedBasketForOrderLight {
 
 	Long id;
-	Double quantity;
+	Long quantity;
 	Long basket;
 	
 	public Long getId() {
@@ -12,10 +12,10 @@ public class OrderedBasketForOrderLight {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public Double getQuantity() {
+	public Long getQuantity() {
 		return quantity;
 	}
-	public void setQuantity(Double quantity) {
+	public void setQuantity(Long quantity) {
 		this.quantity = quantity;
 	}
 	public Long getBasket() {
