@@ -137,12 +137,12 @@ public class OrderController {
 		
 		//Validating create case
 		if (order.getId() == null && verifOrder.isOrderCreateable(result)) {
-			throw new NotAuthorizedException("Non autorisé !");
+			throw new NotAuthorizedException("Il est trop tard pour créer une commande !");
 		}
 		
 		// Validating save case
 		if (order.getId() != null && verifOrder.isOrderSaveable(result)) {
-			throw new NotAuthorizedException("Non autorisé !");
+			throw new NotAuthorizedException("Il est trop tard pour sauvegarder une commande !");
 		}
 		
 		// add cleanly the pickup interval in the order
