@@ -8,10 +8,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.formation.dto.order.OrderLight;
+import com.formation.services.verification.IVerificationOrderService;
 
 @Service
 @Transactional
-public class VerificationOrderService {
+public class VerificationOrderService implements IVerificationOrderService{
 	
 	@Value("${delay_before_locking_order}")
 	private int delayBeforeLock;
