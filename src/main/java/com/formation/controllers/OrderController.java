@@ -1,9 +1,6 @@
 package com.formation.controllers;
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
 import org.aspectj.weaver.ast.Not;
@@ -20,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.formation.dto.order.OrderFull;
 import com.formation.dto.order.OrderLight;
 import com.formation.exceptions.NotAuthorizedException;
+
+import com.formation.persistence.entities.Admin;
 import com.formation.persistence.entities.Client;
 import com.formation.persistence.entities.Order;
 import com.formation.persistence.entities.OrderedBasket;
@@ -29,7 +28,8 @@ import com.formation.services.IClientService;
 import com.formation.services.IOrderService;
 import com.formation.services.IPickUpDateService;
 import com.formation.services.IPlaceService;
-import com.formation.services.verification.IVerificationOrderService;
+import com.formation.services.verification.IVerificationService;
+
 
 @RestController 
 @RequestMapping (path = "api/private/order")
@@ -57,7 +57,7 @@ public class OrderController {
 	private IPickUpDateService servPickUp;
 	
 	@Autowired
-	private IVerificationOrderService verifOrder;
+	private IVerificationService verifOrder;
 	
 	
 	/**
@@ -125,24 +125,23 @@ public class OrderController {
 		if (client != null && !(client.getId().equals(order.getClient()))) {
 			throw new NotAuthorizedException("Non autorisÃ© !");
 		}
-
-		//Validating create case
-		if (order.getId() == null && verifOrder.isOrderCreateable(order)) {
-			throw new NotAuthorizedException("Non autorisÃ© !");
-		}
-		
-		// Validating save case
-		if (order.getId() != null && verifOrder.isOrderSaveable(order)) {
-			throw new NotAuthorizedException("Non autorisÃ© !");
-		}
-		
-
 		
 		Order result = new Order ();
 		// add the id and date to the order.
 		result.setId(order.getId());
 		result.setOrderDate(order.getOrderDate());
 		result.setPickupDate(order.getPickupDate());
+		
+		//Validating create case
+		if (order.getId() == null && verifOrder.isOrderCreateable(result)) {
+			throw new NotAuthorizedException("Il est trop tard pour crÃ©er une commande !");
+		}
+		
+		// Validating save case
+		if (order.getId() != null && verifOrder.isOrderSaveable(result)) {
+			throw new NotAuthorizedException("Il est trop tard pour sauvegarder une commande !");
+		}
+		
 		// add cleanly the pickup interval in the order
 		result.setInterval(servPickUp.findOne(order.getInterval()));
 		// add cleanly the set of baskets in the order
@@ -169,41 +168,18 @@ public class OrderController {
 	
 	@DeleteMapping (path = "/{id}")
 	public boolean deleteById(@PathVariable Long id) {
-				
 		//if (authChecker.getCurrentClient() == null && authChecker.getCurrentAdmin() == null) throw new NotAuthorizedException("Vous n'avez pas les droits pour cette action");
-		
 		Client me = authChecker.getCurrentClient();
-				
-			
+		Admin admin = authChecker.getCurrentAdmin();
 			Order order = servOrder.findOne(id);
-			
-			if (me != null && !order.getClient().equals(me)) throw new NotAuthorizedException("Vous n'avez pas les droits pour cette action");
-			//Si c'est un client mais pas celui qui a passé la commande, alors on n'a pas les droits
-			
-				Order currentOrder = servOrder.findOne(id); 
-				OrderFull currentOrderF = mapper.map(currentOrder, OrderFull.class);
-				Date pickupDate = currentOrderF.getPickupDate();
-			
-				Calendar cal = Calendar.getInstance(Locale.FRANCE); //créer un calendrier avec la logique et la géographie française
-				cal.setTime(pickupDate); //on se positionne sur une date précise
-				cal.add(Calendar.DAY_OF_YEAR, -1); //on se décalle de -1 jour
-				
-				if (System.currentTimeMillis() > cal.getTimeInMillis())  throw new NotAuthorizedException("Il est trop tard pour annuler votre commande.");
-				//System.currentTimeMillis() : récupère l'instant présent en miliseconde calculé depuis un instant donné sans notion de géographie.
-				//cal.getTimeInMillis() : convertit cal en temps de miliseconde calculé depuis un instant donné sans notion de géographie.
-				// t1 > t2 : compare deux dates entre elles. 
-				
+			if (order.getClient().equals(me) || admin != null)
+			{
+				if (verifOrder.isOrderSaveable(order))  throw new NotAuthorizedException("Il est trop tard pour annuler votre commande.");
 				return servOrder.deleteById(id);
-				
-		
-
-	
-	
-
-		
+				}
+					else {
+						throw new NotAuthorizedException("Vous n'avez pas les droits pour cette action");
+			}
 	}
-	
-	
-	
 	
 }
