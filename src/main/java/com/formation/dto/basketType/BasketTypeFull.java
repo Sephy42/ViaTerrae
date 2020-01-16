@@ -18,12 +18,14 @@ public class BasketTypeFull {
 	private String label;
 	
 	private Set<UsedProduct> listProduct;
+	
+	private boolean hasImage;
 
 	public BasketTypeFull() {
 	}
 
 	public BasketTypeFull(Long id, Date beginDate, Date endDate, Double cost, int productCount,
-			Integer quantityAvailable, String label, Set<UsedProduct> listProduct, Picture picture) {
+			Integer quantityAvailable, String label, Set<UsedProduct> listProduct) {
 		this.id = id;
 		this.beginDate = beginDate;
 		this.endDate = endDate;
@@ -33,6 +35,15 @@ public class BasketTypeFull {
 		this.label = label;
 		this.listProduct = listProduct;
 		
+	}
+
+	
+	public boolean isHasImage() {
+		return hasImage;
+	}
+
+	public void setHasImage(boolean hasImage) {
+		this.hasImage = hasImage;
 	}
 
 	public int getProductCount() {

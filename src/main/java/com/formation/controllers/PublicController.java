@@ -147,11 +147,18 @@ public class PublicController {
 	@GetMapping (path = "/baskets")
 	public Set<BasketTypeFull> BasketsForWeek(){
 		Set<BasketTypeFull> basketSet= basketTypeService.BasketsForToday().stream()
-		  .map(b -> mapper.map(b,BasketTypeFull.class))
+		  .map(b -> 
+		  { 
+			  BasketTypeFull btf = mapper.map(b,BasketTypeFull.class); 
+			  btf.setHasImage(b.getPicture() != null);
+			  
+			  return btf;
+		  })
 		  .collect(Collectors.toSet());
 		basketSet.stream().forEach(b -> b.setProductCount(b.getListProduct().size()));
 		return basketSet;
 	}
+	
 	
 	@GetMapping (path = "/basket/{identifiant}/picture", produces = "image/jpeg")
 	@ResponseBody
