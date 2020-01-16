@@ -18,8 +18,7 @@ public class BasketTypeFull {
 	private String label;
 	
 	private Set<UsedProduct> listProduct;
-	private Picture picture;
-	
+
 	public BasketTypeFull() {
 	}
 
@@ -33,13 +32,7 @@ public class BasketTypeFull {
 		this.quantityAvailable = quantityAvailable;
 		this.label = label;
 		this.listProduct = listProduct;
-		this.picture = picture;
-	}
-
-
-
-	public Picture getPicture() {
-		return picture;
+		
 	}
 
 	public int getProductCount() {
@@ -50,9 +43,6 @@ public class BasketTypeFull {
 		this.productCount = productCount;
 	}
 
-	public void setPicture(Picture picture) {
-		this.picture = picture;
-	}
 
 	public Long getId() {
 		return id;
