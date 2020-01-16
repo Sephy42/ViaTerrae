@@ -13,7 +13,7 @@ public class BasketTypeFull {
 	private Date beginDate;
 	private Date endDate;
 	private Double cost;
-	private int ProductCount;
+	private int productCount;
 	private Integer quantityAvailable;
 	private String label;
 	
@@ -29,7 +29,7 @@ public class BasketTypeFull {
 		this.beginDate = beginDate;
 		this.endDate = endDate;
 		this.cost = cost;
-		ProductCount = productCount;
+		this.productCount = productCount;
 		this.quantityAvailable = quantityAvailable;
 		this.label = label;
 		this.listProduct = listProduct;
@@ -43,11 +43,11 @@ public class BasketTypeFull {
 	}
 
 	public int getProductCount() {
-		return ProductCount;
+		return productCount;
 	}
 
 	public void setProductCount(int productCount) {
-		ProductCount = productCount;
+		this.productCount = productCount;
 	}
 
 	public void setPicture(Picture picture) {
