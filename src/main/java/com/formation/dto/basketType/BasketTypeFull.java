@@ -13,34 +13,45 @@ public class BasketTypeFull {
 	private Date beginDate;
 	private Date endDate;
 	private Double cost;
-	private int ProductCount;
+	private int productCount;
 	private Integer quantityAvailable;
 	private String label;
 	
 	private Set<UsedProduct> listProduct;
+	
+	private boolean hasImage;
 
 	public BasketTypeFull() {
 	}
 
 	public BasketTypeFull(Long id, Date beginDate, Date endDate, Double cost, int productCount,
-			Integer quantityAvailable, String label, Set<UsedProduct> listProduct, Picture picture) {
+			Integer quantityAvailable, String label, Set<UsedProduct> listProduct) {
 		this.id = id;
 		this.beginDate = beginDate;
 		this.endDate = endDate;
 		this.cost = cost;
-		ProductCount = productCount;
+		this.productCount = productCount;
 		this.quantityAvailable = quantityAvailable;
 		this.label = label;
 		this.listProduct = listProduct;
 		
 	}
 
+	
+	public boolean isHasImage() {
+		return hasImage;
+	}
+
+	public void setHasImage(boolean hasImage) {
+		this.hasImage = hasImage;
+	}
+
 	public int getProductCount() {
-		return ProductCount;
+		return productCount;
 	}
 
 	public void setProductCount(int productCount) {
-		ProductCount = productCount;
+		this.productCount = productCount;
 	}
 
 
