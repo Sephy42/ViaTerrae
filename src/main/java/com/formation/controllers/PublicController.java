@@ -115,7 +115,15 @@ public class PublicController {
 		if (cl.getFirstName() == null) {
 			cl.setFirstName("Anonyme");
 		}
-		return mapper.map(clientService.save(mapper.map(cl, Client.class)), ClientToSave.class);	
+		
+		Client c = null;
+		try {
+			c = clientService.save(mapper.map(cl, Client.class));
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			throw e;
+		}
+		return mapper.map(c, ClientToSave.class);	
 	}
 	
 	

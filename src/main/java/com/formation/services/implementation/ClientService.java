@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.formation.exceptions.ViaTerraeException;
 import com.formation.persistence.entities.Client;
 import com.formation.persistence.repository.IClientRepository;
 import com.formation.services.IClientService;
@@ -27,4 +28,12 @@ public class ClientService extends AbstractService<Client> implements IClientSer
 		return repo.findByMail(username);
 	}	
 
+	@Override
+	public Client save(Client t) {
+		
+		Client other = findByMail(t.getEmail());
+		if (other != null ) throw new ViaTerraeException(ViaTerraeException.RG_MAIL_NOT_UNIQUE);
+		return super.save(t);
+		
+	}
 }
