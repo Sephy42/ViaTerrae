@@ -16,11 +16,20 @@ public class OrderedBasket {
 	@GeneratedValue (strategy = GenerationType.IDENTITY)
 	Long id;
 	@Column (nullable = false)
-	Double quantity;
+	Long quantity;
 	
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "basket_id",referencedColumnName = "id", nullable = false)
 	BasketType basket;
+	
+	Double costOrdered;
+	
+	public OrderedBasket() {
+	}
+	
+	public OrderedBasket(BasketType basket) {
+		setBasket(basket);
+	}
 
 	public Long getId() {
 		return id;
@@ -30,11 +39,13 @@ public class OrderedBasket {
 		this.id = id;
 	}
 
-	public Double getQuantity() {
+	
+
+	public Long getQuantity() {
 		return quantity;
 	}
 
-	public void setQuantity(Double quantity) {
+	public void setQuantity(Long quantity) {
 		this.quantity = quantity;
 	}
 
@@ -44,7 +55,18 @@ public class OrderedBasket {
 
 	public void setBasket(BasketType basket) {
 		this.basket = basket;
+		setCostOrdered(basket.getCost());
 	}
+	
+	public Double getCostOrdered() {
+		return costOrdered;
+	}
+	public void setCostOrdered(Double costOrdered) {
+		this.costOrdered = costOrdered;
+	}
+
+	
+	
 	
 	
 }

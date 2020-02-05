@@ -16,13 +16,24 @@ public class BasketedProduct {
 	@GeneratedValue (strategy = GenerationType.IDENTITY)
 	Long id;
 	@Column (nullable = false)
-	Integer quantity;
+	Double quantity;
 	@Column (nullable = false)
 	String unit;
 	
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "product_id",referencedColumnName = "id", nullable = false)
 	Product product;
+	
+	public BasketedProduct() {
+		
+	}
+
+	public BasketedProduct(Double quantity, String unit, Product product) {
+		super();
+		this.quantity = quantity;
+		this.unit = unit;
+		this.product = product;
+	}
 
 	public Long getId() {
 		return id;
@@ -32,11 +43,11 @@ public class BasketedProduct {
 		this.id = id;
 	}
 
-	public Integer getQuantity() {
+	public Double getQuantity() {
 		return quantity;
 	}
 
-	public void setQuantity(Integer quantity) {
+	public void setQuantity(Double quantity) {
 		this.quantity = quantity;
 	}
 

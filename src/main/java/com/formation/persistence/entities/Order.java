@@ -1,6 +1,7 @@
 package com.formation.persistence.entities;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -15,8 +16,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.ManyToAny;
-
 @Table (name = "orders") @Entity
 public class Order {
 	@Id
@@ -24,6 +23,11 @@ public class Order {
 	Long id;
 	@Column (name = "order_date",nullable = false)
 	Date orderDate;
+	
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "pickup_interval_id", referencedColumnName = "id", nullable = true)
+	PickUpDate interval;
+	
 	@Column (name = "pickup_date",nullable = false)
 	Date pickupDate;
 	
@@ -38,6 +42,10 @@ public class Order {
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "place_id", referencedColumnName = "id", nullable = false)
 	Place place;
+	
+	public Order() {
+		listBaskets = new HashSet<OrderedBasket>();
+	}
 
 	public Long getId() {
 		return id;
@@ -86,6 +94,37 @@ public class Order {
 	public void setPlace(Place place) {
 		this.place = place;
 	}
-	
-	
+
+	public PickUpDate getInterval() {
+		return interval;
+	}
+
+	public void setInterval(PickUpDate interval) {
+		this.interval = interval;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Order other = (Order) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
+	}
 }
